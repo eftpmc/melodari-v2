@@ -9,7 +9,6 @@ const AuthContext = createContext<AuthContextType | null>(null);
 interface AuthContextType {
   isAuth: boolean;
   setIsAuth: React.Dispatch<React.SetStateAction<boolean>>;
-  checkAuthStatus: () => void;
 }
 
 interface AuthProviderProps {
@@ -17,23 +16,18 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [isAuth, setIsAuth] = useState<boolean>(false);
-  const tokens = useSelector((state: RootState) => state.auth.tokens);
+  const tokens = useSelector((state: RootState) => state.auth.googleTokens);
 
-  const checkAuthStatus = () => {
-    if (tokens?.access_token) {
-      setIsAuth(true);
-    } else {
-      setIsAuth(false);
-    }
-  };
+  const isAuthenticated = tokens && tokens.access_token ? true : false;
+
+  const [isAuth, setIsAuth] = useState<boolean>(isAuthenticated);
 
   useEffect(() => {
-    checkAuthStatus(); // Check user authentication status on component mount
-  }, [tokens]);
+    setIsAuth(isAuthenticated); // Update isAuth whenever tokens change
+  }, [tokens, isAuthenticated]);
 
   return (
-    <AuthContext.Provider value={{ isAuth, setIsAuth, checkAuthStatus }}>
+    <AuthContext.Provider value={{ isAuth, setIsAuth }}>
       {children}
     </AuthContext.Provider>
   );

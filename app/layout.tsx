@@ -18,27 +18,28 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="en">
       <ClientProvider>
-      <body className={`${inter.className} min-h-screen flex flex-col overflow-hidden`}>
-        <header className="w-full bg-base-200 text-base-content p-4 pt-8 flex justify-between items-center z-20 relative" style={{ height: '60px' }}>
-          <Link href="/" passHref>
-            <div className="flex flex-row justify-between items-center">
-              <h1 className="text-xl font-bold">melodari</h1>
+        <body className={`${inter.className} min-h-screen flex flex-col overflow-x-hidden`}>
+          <header
+            className="w-full bg-base-200 text-base-content p-4 pt-8 flex justify-between items-center z-20 relative"
+            style={{ height: "60px" }}
+          >
+            <Link href="/" passHref>
+              <div className="flex flex-row justify-between items-center">
+                <h1 className="text-xl font-bold">melodari</h1>
+              </div>
+            </Link>
+            <div className="flex items-center space-x-4">
+              <ThemeSwitcher />
+              <SignOutButton />
             </div>
-          </Link>
-          <div className="flex items-center space-x-4">
-            <ThemeSwitcher />
-            <SignOutButton />
-          </div>
-        </header>
-        <main className="bg-base-200 z-10 w-full">
-          
+          </header>
+          <main className="bg-base-200 z-10 w-full flex-1">
             {children}
-        </main>
-      </body>
+          </main>
+        </body>
       </ClientProvider>
     </html>
   );

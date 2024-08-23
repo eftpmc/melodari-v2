@@ -10,25 +10,33 @@ interface Tokens {
 }
 
 interface AuthState {
-  tokens: Tokens | null;
+  googleTokens: Tokens | null;
+  otherTokens: Tokens | null;
 }
 
 const initialState: AuthState = {
-  tokens: null,
+  googleTokens: null,
+  otherTokens: null,
 };
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setTokens(state, action: PayloadAction<Tokens>) {
-      state.tokens = action.payload;
+    setGoogleTokens(state, action: PayloadAction<Tokens>) {
+      state.googleTokens = action.payload;
     },
-    clearTokens(state) {
-      state.tokens = null;
+    clearGoogleTokens(state) {
+      state.googleTokens = null;
+    },
+    setOtherTokens(state, action: PayloadAction<Tokens>) {
+      state.otherTokens = action.payload;
+    },
+    clearOtherTokens(state) {
+      state.otherTokens = null;
     },
   },
 });
 
-export const { setTokens, clearTokens } = authSlice.actions;
+export const { setGoogleTokens, clearGoogleTokens, setOtherTokens, clearOtherTokens } = authSlice.actions;
 export default authSlice.reducer;

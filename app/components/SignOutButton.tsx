@@ -3,7 +3,7 @@
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
-import { clearTokens } from "@/utils/redux/authSlice"; // Ensure this path is correct
+import { clearGoogleTokens } from "@/utils/redux/authSlice"; // Ensure this path is correct
 
 const SignOutButton = () => {
   const router = useRouter();
@@ -12,7 +12,7 @@ const SignOutButton = () => {
   const handleSignOut = async () => {
     try {
       // Clear the tokens from Redux state
-      dispatch(clearTokens());
+      dispatch(clearGoogleTokens());
 
       // Sign out the user from their Google account by revoking the token
       const tokens = JSON.parse(localStorage.getItem('google_tokens') || '{}');

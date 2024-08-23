@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { setTokens } from '@/utils/redux/authSlice';
+import { setGoogleTokens, setTokens } from '@/utils/redux/authSlice';
 
 export default function OAuth2Callback() {
   const router = useRouter();
@@ -28,7 +28,7 @@ export default function OAuth2Callback() {
           const data = await res.json();
           if (data.tokens) {
             // Dispatch the tokens to Redux
-            dispatch(setTokens(data.tokens));
+            dispatch(setGoogleTokens(data.tokens));
             router.push('/'); // Redirect to the home page
           } else {
             console.error('Authentication failed:', data.message);
