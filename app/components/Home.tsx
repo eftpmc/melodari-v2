@@ -8,6 +8,7 @@ import { RootState } from '@/utils/redux/store';
 import { setGooglePlaylists } from '@/utils/redux/playlistSlice';
 import { PlaylistItem } from '@/types';
 import YoutubeMusicPlaylistCard from '@/app/components/YoutubeMusicPlaylistCard';
+import SpotifyPlaylistCard from '@/app/components/SpotifyPlaylistCard'
 
 interface PlaylistsResponse {
   items: PlaylistItem[];
@@ -63,6 +64,7 @@ export default function Home() {
   return (
     <div className="flex bg-base-300 min-h-screen flex-col p-8">
       <YoutubeMusicPlaylistCard playlists={playlists} />
+      <SpotifyPlaylistCard isConnected={false} />
     </div>
   );
 }

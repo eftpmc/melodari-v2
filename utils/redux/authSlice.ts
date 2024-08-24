@@ -11,12 +11,12 @@ interface Tokens {
 
 interface AuthState {
   googleTokens: Tokens | null;
-  otherTokens: Tokens | null;
+  spotifyTokens: Tokens | null;
 }
 
 const initialState: AuthState = {
   googleTokens: null,
-  otherTokens: null,
+  spotifyTokens: null,
 };
 
 const authSlice = createSlice({
@@ -29,14 +29,14 @@ const authSlice = createSlice({
     clearGoogleTokens(state) {
       state.googleTokens = null;
     },
-    setOtherTokens(state, action: PayloadAction<Tokens>) {
-      state.otherTokens = action.payload;
+    setSpotifyTokens(state, action: PayloadAction<Tokens>) {
+      state.spotifyTokens = action.payload;
     },
-    clearOtherTokens(state) {
-      state.otherTokens = null;
+    clearSpotifyTokens(state) {
+      state.spotifyTokens = null;
     },
   },
 });
 
-export const { setGoogleTokens, clearGoogleTokens, setOtherTokens, clearOtherTokens } = authSlice.actions;
+export const { setGoogleTokens, clearGoogleTokens, setSpotifyTokens, clearSpotifyTokens } = authSlice.actions;
 export default authSlice.reducer;

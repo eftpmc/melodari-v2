@@ -8,6 +8,8 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 interface AuthContextType {
   isAuth: boolean;
+  isGoogleAuth: boolean;
+  isSpotifyAuth: boolean; // Example for Facebook auth
   setIsAuth: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -16,18 +18,24 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const tokens = useSelector((state: RootState) => state.auth.googleTokens);
+  const googleTokens = useSelector((state: RootState) => state.auth.googleTokens);
+  const spotifyTokens = useSelector((state: RootState) => state.auth.spotifyTokens); // Example for Facebook tokens
 
-  const isAuthenticated = tokens && tokens.access_token ? true : false;
+  const isGoogleAuthenticated = !!googleTokens?.access_token;
+  const isSpotifyAuthenticated = !!spotifyTokens?.access_token; // Example for Facebook authentication
 
-  const [isAuth, setIsAuth] = useState<boolean>(isAuthenticated);
+  const [isGoogleAuth, setIsGoogleAuth] = useState<boolean>(isGoogleAuthenticated);
+  const [isSpotifyAuth, setIsSpotifyAuth] = useState<boolean>(isSpotifyAuthenticated); // Example for Facebook auth
+  const [isAuth, setIsAuth] = useState<boolean>(isGoogleAuthenticated || isSpotifyAuthenticated);
 
   useEffect(() => {
-    setIsAuth(isAuthenticated); // Update isAuth whenever tokens change
-  }, [tokens, isAuthenticated]);
+    setIsGoogleAuth(isGoogleAuthenticated);
+    setIsSpotifyAuth(isSpotifyAuthenticated); // Update Facebook auth status
+    setIsAuth(isGoogleAuthenticated || isSpotifyAuthenticated); // Set isAuth based on any provider being authenticated
+  }, [isGoogleAuthenticated, isSpotifyAuthenticated]);
 
   return (
-    <AuthContext.Provider value={{ isAuth, setIsAuth }}>
+    <AuthContext.Provider value={{ isAuth, isGoogleAuth, isSpotifyAuth, setIsAuth }}>
       {children}
     </AuthContext.Provider>
   );
