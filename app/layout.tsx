@@ -36,7 +36,7 @@ export default function RootLayout({
               <SignOutButton />
             </div>
           </header>
-          <main className="bg-base-200 z-10 w-full flex-1">
+          <main className="bg-base-300 z-10 w-full flex-1">
             {children}
           </main>
         </body>
