@@ -21,6 +21,7 @@ export interface PlaylistItemSnippet {
   }
   
 export interface PlaylistItem {
+    songs: any;
     id: string;
     snippet: PlaylistItemSnippet;
   }
