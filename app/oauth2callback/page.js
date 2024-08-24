@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setGoogleTokens, setTokens } from '@/utils/redux/authSlice';
+import { Loader2 } from "lucide-react";
 
 export default function OAuth2Callback() {
   const router = useRouter();
@@ -14,7 +15,7 @@ export default function OAuth2Callback() {
     const exchangeCodeForTokens = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get('code');
-      
+
       if (code) {
         try {
           const res = await fetch('/api/auth/google', {
@@ -50,8 +51,9 @@ export default function OAuth2Callback() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <h1 className="text-2xl font-semibold">Processing...</h1>
+      <div className="flex items-center justify-center min-h-screen bg-base-300 text-base-content text-semibold pb-24">
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        Processing..
       </div>
     );
   }

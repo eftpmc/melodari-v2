@@ -1,5 +1,8 @@
+"use client"
+
 import { useState } from 'react';
 import { PlaylistItem } from '@/types';
+import PlaylistCard from './PlaylistCard';
 
 interface FilterablePlaylistProps {
   googlePlaylists: PlaylistItem[];
@@ -34,20 +37,10 @@ export default function FilterablePlaylist({ googlePlaylists, spotifyPlaylists }
           Spotify
         </span>
       </div>
-      <div className="mt-4">
+      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {filteredPlaylists.length > 0 ? (
           filteredPlaylists.map((playlist) => (
-            <div key={playlist.id} className="bg-base-200 p-4 rounded-lg shadow-md w-full my-2 flex items-center">
-              <img
-                src={playlist.snippet.thumbnails.medium.url}
-                alt={playlist.snippet.title}
-                className="w-12 h-12 object-cover rounded-lg"
-              />
-              <div className="ml-4 flex-1">
-                <div className="text-base-content font-semibold">{playlist.snippet.title}</div>
-                <div className="text-sm text-gray-500">{/* Author Name (if available) */}</div>
-              </div>
-            </div>
+            <PlaylistCard key={playlist.id} playlist={playlist} />
           ))
         ) : (
           <div className="bg-base-200 p-4 rounded-lg shadow-md w-full my-2 flex items-center text-base-content">No playlists found.</div>

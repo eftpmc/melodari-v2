@@ -23,15 +23,15 @@ const config: Config = {
       {
         light: {
           ...require("daisyui/src/theming/themes")["light"],
-          primary: "purple",
-          secondary: "teal",
+          primary: "#E97FAF",
+          secondary: "#3F01E7",
         },
       },
       {
         dark: {
           ...require("daisyui/src/theming/themes")["dark"],
-          primary: "purple",
-          secondary: "teal",
+          primary: "#E97FAF",
+          secondary: "#3F01E7",
         },
       }
     ], // Ensure that both light and dark themes are enabled
