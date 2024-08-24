@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/utils/redux/store';
 import { setGooglePlaylists } from '@/utils/redux/playlistSlice';
 import { PlaylistItem } from '@/types';
+import YouTubeMusicAccordion from '@/app/components/YouTubeMusicAccordion';
 
 interface PlaylistsResponse {
   items: PlaylistItem[];
@@ -60,49 +61,8 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-8">
-      <div className="overflow-x-auto w-full">
-        <table className="table w-full table-zebra">
-          <thead>
-            <tr>
-              <th>Image</th>
-              <th>Title</th>
-              <th>Author</th>
-              <th>Info</th>
-            </tr>
-          </thead>
-          <tbody>
-            {playlists.length > 0 ? (
-              playlists.map((playlist) => (
-                <tr key={playlist.id}>
-                  <td>
-                    <div className="flex items-center space-x-3">
-                      <div className="avatar">
-                        <div className="w-16 h-16 mask mask-squircle">
-                          <img src={playlist.snippet.thumbnails.medium.url} alt={playlist.snippet.title} />
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="font-bold text-base-content">{playlist.snippet.title}</div>
-                  </td>
-                  <td>
-                    <span className="text-sm opacity-75">{/* Author Name (if available) */}</span>
-                  </td>
-                  <td>
-                    <span className="text-sm">{playlist.snippet.description}</span>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={4} className="text-center">No playlists found.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </main>
+    <div className="flex bg-base-300 min-h-screen flex-col p-8">
+      <YouTubeMusicAccordion playlists={playlists} />
+    </div>
   );
 }
