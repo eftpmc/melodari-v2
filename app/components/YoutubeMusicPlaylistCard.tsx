@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { PlaylistItem } from '@/types';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 
-interface YouTubeMusicPlaylistCardProps {
+interface YoutubeMusicPlaylistCardProps {
   playlists: PlaylistItem[];
 }
 
-export default function YouTubeMusicPlaylistCard({ playlists }: YouTubeMusicPlaylistCardProps) {
+export default function YoutubeMusicPlaylistCard({ playlists }: YoutubeMusicPlaylistCardProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleOpen = () => {
@@ -16,7 +16,7 @@ export default function YouTubeMusicPlaylistCard({ playlists }: YouTubeMusicPlay
   return (
     <div className="bg-base-200 p-4 rounded-lg shadow-md w-full">
       <div className="flex items-center justify-between">
-        <div className="text-lg font-semibold text-base-content">YouTube Music Playlists</div>
+        <div className="text-lg font-semibold text-base-content">Youtube Music Playlists</div>
         <button onClick={toggleOpen} className="focus:outline-none">
           {isOpen ? (
             <ChevronUp className="w-6 h-6 text-gray-600" />

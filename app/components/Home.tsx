@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/utils/redux/store';
 import { setGooglePlaylists } from '@/utils/redux/playlistSlice';
 import { PlaylistItem } from '@/types';
-import YouTubeMusicPlaylistCard from '@/app/components/YouTubeMusicPlaylistCard';
+import YoutubeMusicPlaylistCard from '@/app/components/YoutubeMusicPlaylistCard';
 
 interface PlaylistsResponse {
   items: PlaylistItem[];
@@ -62,7 +62,7 @@ export default function Home() {
 
   return (
     <div className="flex bg-base-300 min-h-screen flex-col p-8">
-      <YouTubeMusicPlaylistCard playlists={playlists} />
+      <YoutubeMusicPlaylistCard playlists={playlists} />
     </div>
   );
 }
