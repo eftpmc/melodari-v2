@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { FaSpotify, FaYoutube } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
@@ -10,6 +10,53 @@ const SettingsPage = () => {
   const { isGoogleAuth, isSpotifyAuth } = useAuth();
   const savedGooglePlaylists = useSelector((state: RootState) => Object.keys(state.playlists.google).length > 0);
   const savedSpotifyPlaylists = useSelector((state: RootState) => Object.keys(state.playlists.spotify).length > 0);
+
+  const [loadingGoogle, setLoadingGoogle] = useState(false);
+  const [loadingSpotify, setLoadingSpotify] = useState(false);
+
+  const handleGoogleLogin = async () => {
+    setLoadingGoogle(true);
+
+    try {
+      const res = await fetch("/api/auth/google", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await res.json();
+      if (data.authorizeUrl) {
+        window.location.href = data.authorizeUrl;
+      }
+    } catch (error) {
+      console.error("Error during Google authentication", error);
+    } finally {
+      setLoadingGoogle(false);
+    }
+  };
+
+  const handleSpotifyLogin = async () => {
+    setLoadingSpotify(true);
+
+    try {
+      const res = await fetch("/api/auth/spotify", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await res.json();
+      if (data.authorizeUrl) {
+        window.location.href = data.authorizeUrl;
+      }
+    } catch (error) {
+      console.error("Error during Spotify authentication", error);
+    } finally {
+      setLoadingSpotify(false);
+    }
+  };
 
   return (
     <div className="min-h-screen p-8 bg-base-300">
@@ -30,11 +77,17 @@ const SettingsPage = () => {
             </p>
           </div>
           <button
+            onClick={handleGoogleLogin}
             className={`btn btn-sm ${
-              isGoogleAuth ? "btn-success" : savedGooglePlaylists ? "btn-base-content" : "btn-error"
+              isGoogleAuth ? "btn-success" : savedGooglePlaylists ? "btn-warning" : "btn-error"
             }`}
+            disabled={loadingGoogle}
           >
-            {isGoogleAuth ? "Connected" : savedGooglePlaylists ? "View Playlists" : "Connect"}
+            {loadingGoogle
+              ? "Connecting..."
+              : isGoogleAuth
+              ? "Connected"
+              : "Update Playlists"}
           </button>
         </div>
 
@@ -52,11 +105,17 @@ const SettingsPage = () => {
             </p>
           </div>
           <button
+            onClick={handleSpotifyLogin}
             className={`btn btn-sm ${
               isSpotifyAuth ? "btn-success" : savedSpotifyPlaylists ? "btn-base-content" : "btn-error"
             }`}
+            disabled={loadingSpotify}
           >
-            {isSpotifyAuth ? "Connected" : savedSpotifyPlaylists ? "View Playlists" : "Connect"}
+            {loadingSpotify
+              ? "Connecting..."
+              : isSpotifyAuth
+              ? "Connected"
+              : "Update Playlists"}
           </button>
         </div>
       </div>
