@@ -33,7 +33,7 @@ export default function Home() {
     }
 
     const fetchGooglePlaylists = async () => {
-      if (googleTokens?.access_token) {
+      if (googleTokens?.access_token && Object.keys(storedGooglePlaylists).length === 0) {
         try {
           const res = await fetch('https://www.googleapis.com/youtube/v3/playlists?part=snippet&mine=true&maxResults=50', {
             method: 'GET',
