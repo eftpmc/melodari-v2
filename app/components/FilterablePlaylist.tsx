@@ -1,16 +1,18 @@
-"use client"
+"use client";
 
 import { useState } from 'react';
-import { PlaylistItem } from '@/types';
+import { Playlist } from '@/types';
 import PlaylistCard from './PlaylistCard';
+import PlaylistModal from './PlaylistModal';
 
 interface FilterablePlaylistProps {
-  googlePlaylists: PlaylistItem[];
-  spotifyPlaylists: PlaylistItem[];
+  googlePlaylists: Playlist[];
+  spotifyPlaylists: Playlist[];
 }
 
 export default function FilterablePlaylist({ googlePlaylists, spotifyPlaylists }: FilterablePlaylistProps) {
   const [filter, setFilter] = useState<'All' | 'YouTube Music' | 'Spotify'>('All');
+  const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
 
   const getFilteredPlaylists = () => {
     if (filter === 'YouTube Music') {
@@ -23,6 +25,14 @@ export default function FilterablePlaylist({ googlePlaylists, spotifyPlaylists }
   };
 
   const filteredPlaylists = getFilteredPlaylists();
+
+  const openModal = (playlist: Playlist) => {
+    setSelectedPlaylist(playlist);
+  };
+
+  const closeModal = () => {
+    setSelectedPlaylist(null);
+  };
 
   return (
     <div className="p-8">
@@ -40,12 +50,20 @@ export default function FilterablePlaylist({ googlePlaylists, spotifyPlaylists }
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {filteredPlaylists.length > 0 ? (
           filteredPlaylists.map((playlist) => (
-            <PlaylistCard key={playlist.id} playlist={playlist} />
+            <PlaylistCard 
+              key={playlist.id} 
+              playlist={playlist} 
+              onClick={() => openModal(playlist)}  // Provide the onClick prop
+            />
           ))
         ) : (
           <div className="bg-base-200 p-4 rounded-lg shadow-md w-full my-2 flex items-center text-base-content">No playlists found.</div>
         )}
       </div>
+
+      {selectedPlaylist && (
+        <PlaylistModal playlist={selectedPlaylist} onClose={closeModal} />
+      )}
     </div>
   );
 }

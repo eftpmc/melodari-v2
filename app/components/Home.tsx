@@ -6,11 +6,11 @@ import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/utils/redux/store';
 import { setGooglePlaylists } from '@/utils/redux/playlistSlice';
-import { PlaylistItem } from '@/types';
-import FilterablePlaylist from '@/app/components/FilterablePlaylist'
+import { Playlist } from '@/types';
+import FilterablePlaylist from '@/app/components/FilterablePlaylist';
 
 interface PlaylistsResponse {
-  items: PlaylistItem[];
+  items: Playlist[];
 }
 
 export default function Home() {
@@ -19,7 +19,7 @@ export default function Home() {
   const dispatch = useDispatch();
   const googleTokens = useSelector((state: RootState) => state.auth.googleTokens);
   const storedGooglePlaylists = useSelector((state: RootState) => state.playlists.google);
-  const [googlePlaylists, setGooglePlaylistsClient] = useState<PlaylistItem[]>(storedGooglePlaylists);
+  const [googlePlaylists, setGooglePlaylistsClient] = useState<Playlist[]>([]);
 
   useEffect(() => {
     if (!isAuth) {
@@ -28,7 +28,7 @@ export default function Home() {
     }
 
     const fetchPlaylists = async () => {
-      if (googleTokens?.access_token && storedGooglePlaylists.length === 0) {
+      if (googleTokens?.access_token && Object.keys(storedGooglePlaylists).length === 0) {
         try {
           const res = await fetch('https://www.googleapis.com/youtube/v3/playlists?part=snippet&mine=true&maxResults=50', {
             method: 'GET',
@@ -41,19 +41,27 @@ export default function Home() {
           if (res.ok) {
             const data: PlaylistsResponse = await res.json();
             setGooglePlaylistsClient(data.items || []);
-            dispatch(setGooglePlaylists(data.items || [])); // Store playlists in Redux
+
+            // Store the playlists in Redux, ensuring each playlist has its ID and an empty songs array
+            const playlistsWithSongs = data.items.map((playlist) => ({
+              ...playlist,
+              songs: [], // Initialize songs array
+            }));
+
+            dispatch(setGooglePlaylists(playlistsWithSongs));
           } else {
             console.error('Failed to fetch playlists:', res.statusText);
           }
         } catch (error) {
           console.error('Error fetching playlists:', error);
         }
+      } else {
+        // Set playlists from Redux if already fetched
+        setGooglePlaylistsClient(Object.values(storedGooglePlaylists));
       }
     };
 
-    if (storedGooglePlaylists.length === 0) {
-      fetchPlaylists();
-    }
+    fetchPlaylists();
   }, [isAuth, router, googleTokens, dispatch, storedGooglePlaylists]);
 
   if (!isAuth) {

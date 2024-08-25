@@ -1,30 +1,39 @@
-// store/playlistsSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {PlaylistItem} from '@/types'
+import { Playlist, Song } from '@/types';
 
 interface PlaylistsState {
-  google: PlaylistItem[];
-  // Add other sources like Spotify, Apple Music, etc. in the future
+  google: {
+    [playlistId: string]: Playlist;
+  };
 }
 
 const initialState: PlaylistsState = {
-  google: [],
-  // Add initial states for other sources here
+  google: {},
 };
 
-const playlistsSlice = createSlice({
+const playlistSlice = createSlice({
   name: 'playlists',
   initialState,
   reducers: {
-    setGooglePlaylists(state, action: PayloadAction<PlaylistItem[]>) {
-      state.google = action.payload;
+    setGooglePlaylists(state, action: PayloadAction<Playlist[]>) {
+      action.payload.forEach((playlist) => {
+        state.google[playlist.id] = {
+          ...playlist,
+          songs: [], // Initialize with empty songs array
+        };
+      });
     },
-    clearGooglePlaylists(state) {
-      state.google = [];
+    setPlaylistSongs(
+      state,
+      action: PayloadAction<{ playlistId: string; songs: Song[] }>
+    ) {
+      const playlist = state.google[action.payload.playlistId];
+      if (playlist) {
+        playlist.songs = action.payload.songs;
+      }
     },
-    // Add reducers for other sources as needed
   },
 });
 
-export const { setGooglePlaylists, clearGooglePlaylists } = playlistsSlice.actions;
-export default playlistsSlice.reducer;
+export const { setGooglePlaylists, setPlaylistSongs } = playlistSlice.actions;
+export default playlistSlice.reducer;

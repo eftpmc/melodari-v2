@@ -1,13 +1,17 @@
 import React from 'react';
-import { PlaylistItem } from '@/types';
+import { Playlist } from '@/types';
 
 interface PlaylistCardProps {
-  playlist: PlaylistItem;
+  playlist: Playlist;
+  onClick: () => void; // Add an onClick prop to handle opening the modal
 }
 
-const PlaylistCard: React.FC<PlaylistCardProps> = ({ playlist }) => {
+const PlaylistCard: React.FC<PlaylistCardProps> = ({ playlist, onClick }) => {
   return (
-    <div className="bg-base-200 p-4 rounded-lg shadow-md w-contain m-1 flex items-center">
+    <div
+      className="bg-base-200 p-4 rounded-lg shadow-md w-contain m-1 flex items-center cursor-pointer"
+      onClick={onClick} // Open the modal when the card is clicked
+    >
       <img
         src={playlist.snippet.thumbnails.medium.url}
         alt={playlist.snippet.title}
@@ -15,7 +19,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({ playlist }) => {
       />
       <div className="ml-4 flex-1">
         <div className="text-base-content font-semibold">{playlist.snippet.title}</div>
-        <div className="text-sm text-gray-500">{/* Author Name (if available) */}</div>
+        <div className="text-sm text-gray-500">{/* Additional Info (e.g., Author) */}</div>
       </div>
     </div>
   );
