@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSpotifyAuth } from '@/contexts/SpotifyAuthContext';
+import { useGoogleAuth } from '@/contexts/GoogleAuthContext';
 import { FaSpotify, FaYoutube } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/utils/redux/store';
 
 const SettingsPage = () => {
-  const { isGoogleAuth, isSpotifyAuth, logoutGoogle, logoutSpotify } = useAuth();
+  const {isGoogleAuth, logoutGoogle} = useGoogleAuth();
+  const {isSpotifyAuth, logoutSpotify} = useSpotifyAuth();
   const savedGooglePlaylists = useSelector((state: RootState) => state.playlists.google);
   const savedSpotifyPlaylists = useSelector((state: RootState) => state.playlists.spotify);
 

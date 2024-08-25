@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/utils/redux/store';
 import { Playlist, Song } from '@/types';
-import { setPlaylistSongs } from '@/utils/redux/playlistSlice';
+import { fetchGooglePlaylistSongs } from '@/utils/google/googleService';
+import { fetchSpotifyPlaylistSongs } from '@/utils/spotify/spotifyService';
 
 interface PlaylistModalProps {
   playlist: Playlist;
@@ -13,58 +14,28 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   
-  // Retrieve the Google tokens and songs from the Redux store
+  // Retrieve tokens and songs from the Redux store
   const googleTokens = useSelector((state: RootState) => state.auth.googleTokens);
-  const songs = useSelector((state: RootState) => 
-    state.playlists.google[playlist.id]?.songs
-  );
+  const spotifyTokens = useSelector((state: RootState) => state.auth.spotifyTokens);
+  const googleSongs = useSelector((state: RootState) => state.playlists.google[playlist.id]?.songs);
+  const spotifySongs = useSelector((state: RootState) => state.playlists.spotify[playlist.id]?.songs);
 
   useEffect(() => {
-    const fetchSongs = async () => {    
-      if (!googleTokens) {
-        console.error("Google tokens are null");
-        return;
+    const loadSongs = async () => {
+      if (googleTokens) {
+        await fetchGooglePlaylistSongs(googleTokens.access_token, playlist.id, dispatch);
+      } else if (spotifyTokens) {
+        await fetchSpotifyPlaylistSongs(spotifyTokens.access_token, playlist.id, dispatch);
       }
-
-      if (songs && songs.length === 0) {
-        try {
-          const res = await fetch(
-            `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlist.id}&maxResults=50`, 
-            {
-              method: 'GET',
-              headers: {
-                Authorization: `Bearer ${googleTokens.access_token}`,
-                Accept: 'application/json',
-              },
-            }
-          );
-
-          if (res.ok) {
-            const data = await res.json();
-            const fetchedSongs: Song[] = data.items.map((item: any) => ({
-              id: item.id,
-              snippet: item.snippet,
-            }));
-
-            // Store the songs in Redux
-            dispatch(setPlaylistSongs({ playlistId: playlist.id, songs: fetchedSongs }));
-          } else {
-            console.error('Failed to fetch playlist items:', res.statusText);
-          }
-        } catch (error) {
-          console.error('Error fetching playlist items:', error);
-        } finally {
-          setLoading(false);
-        }
-      } else {
-        setLoading(false);
-      }
+      setLoading(false);
     };
 
-    fetchSongs();
-  }, [dispatch, playlist.id, songs, googleTokens]);
+    loadSongs();
+  }, [dispatch, playlist.id, googleSongs, spotifySongs, googleTokens, spotifyTokens]);
 
   if (!playlist) return null;
+
+  const songs = googleTokens ? googleSongs : spotifyTokens ? spotifySongs : [];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -84,7 +55,7 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
           <ul className="space-y-2">
             {songs.map((song, index) => (
               <li key={song.id} className="text-base-content">
-                {index + 1}. {song.title}
+                {index + 1}. {song.title} {song.artists ? `by ${song.artists.join(', ')}` : ''}
               </li>
             ))}
           </ul>

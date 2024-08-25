@@ -1,4 +1,4 @@
-import { generateSpotifyAuthUrl, exchangeSpotifyCodeForTokens, getState } from "@/utils/spotifyAuth";
+import { generateSpotifyAuthUrl, exchangeSpotifyCodeForTokens, getState } from "@/utils/spotify/spotifyAuth";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
