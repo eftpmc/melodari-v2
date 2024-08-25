@@ -1,4 +1,4 @@
-import { getOAuth2Client } from "@/utils/googleAuth";
+import { getOAuth2Client } from "@/utils/google/googleAuth";
 
 export async function POST() {
     try {

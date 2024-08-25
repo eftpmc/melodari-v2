@@ -1,4 +1,4 @@
-import { refreshSpotifyTokens } from "@/utils/spotifyAuth";
+import { refreshSpotifyTokens } from "@/utils/spotify/spotifyAuth";
 
 export async function POST() {
     try {
