@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 import ThemeSwitcher from "./components/ThemeSwitcher";
-import SignOutButton from "./components/SignOutButton";
+import MenuButton from "./components/MenuButton";
 import ClientProvider from "./components/ClientProvider"; // Import your ClientProvider
 
 const inter = Inter({ subsets: ["latin"] });
@@ -33,7 +33,7 @@ export default function RootLayout({
             </Link>
             <div className="flex items-center space-x-4">
               <ThemeSwitcher />
-              <SignOutButton />
+              <MenuButton />
             </div>
           </header>
           <main className="bg-base-300 z-10 w-full flex-1">

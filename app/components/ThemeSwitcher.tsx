@@ -17,7 +17,7 @@ const ThemeSwitcher = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="btn btn-square"
+      className="btn btn-square bg-base-100"
     >
       {theme === "light" ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
     </button>

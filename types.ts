@@ -1,57 +1,79 @@
-// Song type to represent individual items in a playlist
+export interface Image {
+    url: string;
+    width: number;
+    height: number;
+}
+
 export interface Song {
     id: string;
-    snippet: {
-      title: string;
-      description: string;
-      position: number;
-      resourceId: {
-        videoId: string;
-      };
-      thumbnails: {
-        default: {
-          url: string;
-          width: number;
-          height: number;
-        };
-        medium: {
-          url: string;
-          width: number;
-          height: number;
-        };
-        high: {
-          url: string;
-          width: number;
-          height: number;
-        };
-      };
+    title: string;
+    thumbnails: {
+      default: string;
+      medium: string;
+      high: string;
+    };
+    artists?: string[];  // Optional artists field
+  }
+
+// Playlist type to represent the playlist itself, including an array of Song
+// Create a unified Playlist type to be used across the app
+export interface Playlist {
+    id: string;
+    title: string;
+    description?: string; // Optional description field
+    thumbnails: {
+      default: string;
+      medium: string;
+      high: string;
+    };
+    songs: Song[]; // Array of Song objects
+  }
+  
+// Define the Google-specific playlist type
+export interface GoogleSong {
+    id: string;
+    title: string;
+    videoId: string;
+    thumbnails: {
+      default: string;
+      medium: string;
+      high: string;
     };
   }
   
-  // Playlist type to represent the playlist itself, including an array of Song
-  export interface Playlist {
+  export interface GooglePlaylist {
     id: string;
-    snippet: {
-      title: string;
-      description: string;
-      thumbnails: {
-        default: {
-          url: string;
-          width: number;
-          height: number;
-        };
-        medium: {
-          url: string;
-          width: number;
-          height: number;
-        };
-        high: {
-          url: string;
-          width: number;
-          height: number;
-        };
-      };
+    title: string;
+    description: string;
+    thumbnails: {
+      default: string;
+      medium: string;
+      high: string;
     };
-    songs: Song[];  // Array of songs in the playlist
+    songs: GoogleSong[];
+  }
+  
+  // Define the Spotify-specific playlist type
+  export interface SpotifyTrack {
+    id: string;
+    name: string;
+    album: {
+      images: {
+        url: string;
+      }[];
+    };
+    artists: {
+      name: string;
+    }[];
+  }
+  
+  export interface SpotifyPlaylist {
+    id: string;
+    name: string;
+    description: string;
+    images: {
+      url: string;
+    }[];
+    tracks: SpotifyTrack[];
   }
   

@@ -71,12 +71,12 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-base-100 p-6 rounded-lg shadow-lg max-w-lg w-full">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-base-content">{playlist.snippet.title}</h2>
+          <h2 className="text-xl font-bold text-base-content">{playlist.title}</h2>
           <button onClick={onClose} className="text-base-content text-xl">&times;</button>
         </div>
         <img
-          src={playlist.snippet.thumbnails.high.url}
-          alt={playlist.snippet.title}
+          src={playlist.thumbnails.high}
+          alt={playlist.title}
           className="w-full h-auto object-cover rounded-lg mb-4"
         />
         {loading ? (
@@ -85,7 +85,7 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
           <ul className="space-y-2">
             {songs.map((song, index) => (
               <li key={song.id} className="text-base-content">
-                {index + 1}. {song.snippet.title}
+                {index + 1}. {song.title}
               </li>
             ))}
           </ul>

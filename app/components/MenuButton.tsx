@@ -46,10 +46,10 @@ const MenuButton = () => {
 
   return (
     <div className="dropdown dropdown-end">
-      <label tabIndex={0} className="btn btn-square">
+      <label tabIndex={0} className="btn btn-square bg-base-100">
         <Menu className="w-6 h-6" />
       </label>
-      <ul tabIndex={0} className="dropdown-content menu p-2 m-2 shadow bg-base-200 rounded-box w-52">
+      <ul tabIndex={0} className="dropdown-content bg-base-100 menu p-2 m-2 shadow rounded-box w-52">
         <li>
           <a onClick={handleSettings} className="flex items-center">
             <Settings className="w-4 h-4 mr-2" /> Settings

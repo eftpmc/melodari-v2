@@ -5,10 +5,14 @@ interface PlaylistsState {
   google: {
     [playlistId: string]: Playlist;
   };
+  spotify: {
+    [playlistId: string]: Playlist;
+  };
 }
 
 const initialState: PlaylistsState = {
   google: {},
+  spotify: {}, // Initialize with an empty object to avoid undefined issues
 };
 
 const playlistSlice = createSlice({
@@ -23,17 +27,29 @@ const playlistSlice = createSlice({
         };
       });
     },
+    setSpotifyPlaylists(state, action: PayloadAction<Playlist[]>) {
+      action.payload.forEach((playlist) => {
+        state.spotify[playlist.id] = {
+          ...playlist,
+          songs: [], // Initialize with empty songs array
+        };
+      });
+    },
     setPlaylistSongs(
       state,
       action: PayloadAction<{ playlistId: string; songs: Song[] }>
     ) {
-      const playlist = state.google[action.payload.playlistId];
-      if (playlist) {
-        playlist.songs = action.payload.songs;
+      const googlePlaylist = state.google[action.payload.playlistId];
+      const spotifyPlaylist = state.spotify[action.payload.playlistId];
+
+      if (googlePlaylist) {
+        googlePlaylist.songs = action.payload.songs;
+      } else if (spotifyPlaylist) {
+        spotifyPlaylist.songs = action.payload.songs;
       }
     },
   },
 });
 
-export const { setGooglePlaylists, setPlaylistSongs } = playlistSlice.actions;
+export const { setGooglePlaylists, setSpotifyPlaylists, setPlaylistSongs } = playlistSlice.actions;
 export default playlistSlice.reducer;
