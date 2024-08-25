@@ -31,12 +31,14 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4 pb-24">
-      <h1 className="text-3xl font-bold mb-4 text-center text-base-content">
-        A{" "}
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
-          Universal
-        </span>{" "}
-        Approach to Music
+      <h1 className="text-3xl font-bold mb-4 text-center text-base-content leading-tight">
+        <span className="inline-block">
+          A{" "}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
+            Universal
+          </span>
+        </span>
+        <span className="block sm:inline">{" "}Approach to Music</span>
       </h1>
       <p className="text-base-content mb-8 text-center max-w-md">
         Discover and connect with the best music services all in one place.

@@ -69,7 +69,7 @@ export default function Home() {
   }
 
   return (
-    <div className="p-8 bg-base-300">
+    <div className="py-8 bg-base-300">
       <FilterablePlaylist googlePlaylists={googlePlaylists} spotifyPlaylists={[]} />
     </div>
   );
