@@ -30,27 +30,27 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center pb-24">
-      <h1 className="text-3xl font-bold mb-4 text-base-content">
+    <div className="flex min-h-screen flex-col items-center justify-center px-4 pb-24">
+      <h1 className="text-3xl font-bold mb-4 text-center text-base-content">
         A{" "}
         <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
           Universal
         </span>{" "}
         Approach to Music
       </h1>
-      <p className="text-base-content mb-8">
+      <p className="text-base-content mb-8 text-center max-w-md">
         Discover and connect with the best music services all in one place.
       </p>
       <button
         onClick={handleLogin}
-        className="btn btn-error flex items-center text-base-200 py-3 px-6 rounded-lg shadow-lg" // Apply base-content color
+        className="btn btn-error flex items-center text-base-200 py-3 px-6 rounded-lg shadow-lg"
         disabled={loading}
       >
         {loading ? (
           "Connecting..."
         ) : (
           <>
-            <FaGoogle className="mr-2 w-5 h-5 text-base-200" /> {/* Apply base-content color to icon */}
+            <FaGoogle className="mr-2 w-5 h-5 text-base-200" />
             Connect with Google
           </>
         )}
