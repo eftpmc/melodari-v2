@@ -24,13 +24,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const isGoogleAuthenticated = !!googleTokens?.access_token;
   const isSpotifyAuthenticated = !!spotifyTokens?.access_token; // Example for Facebook authentication
 
+
   const [isGoogleAuth, setIsGoogleAuth] = useState<boolean>(isGoogleAuthenticated);
   const [isSpotifyAuth, setIsSpotifyAuth] = useState<boolean>(isSpotifyAuthenticated); // Example for Facebook auth
   const [isAuth, setIsAuth] = useState<boolean>(isGoogleAuthenticated || isSpotifyAuthenticated);
 
   useEffect(() => {
     setIsGoogleAuth(isGoogleAuthenticated);
-    setIsSpotifyAuth(isSpotifyAuthenticated); // Update Facebook auth status
+    setIsSpotifyAuth(isSpotifyAuthenticated);
     setIsAuth(isGoogleAuthenticated || isSpotifyAuthenticated); // Set isAuth based on any provider being authenticated
   }, [isGoogleAuthenticated, isSpotifyAuthenticated]);
 

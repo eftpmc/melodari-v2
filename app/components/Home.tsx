@@ -22,6 +22,7 @@ export default function Home() {
   const [googlePlaylists, setGooglePlaylistsClient] = useState<Playlist[]>([]);
 
   useEffect(() => {
+    console.log("isAuth:", isAuth); // Log isAuth value
     if (!isAuth) {
       router.push('/login'); // Redirect to login if not authenticated
       return;
@@ -63,10 +64,6 @@ export default function Home() {
 
     fetchPlaylists();
   }, [isAuth, router, googleTokens, dispatch, storedGooglePlaylists]);
-
-  if (!isAuth) {
-    return null;
-  }
 
   return (
     <div className="py-8 bg-base-300">
