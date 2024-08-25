@@ -2,42 +2,15 @@
 
 import { Menu, LogOut, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
-import { clearGoogleTokens, clearSpotifyTokens } from "@/utils/redux/authSlice"; // Ensure this path is correct
+import { useAuth } from '@/contexts/AuthContext';
 
 const MenuButton = () => {
   const router = useRouter();
-  const dispatch = useDispatch();
+  const { logout } = useAuth();
 
   const handleSignOut = async () => {
-    try {
-      // Clear the tokens from Redux state
-      dispatch(clearGoogleTokens());
-      dispatch(clearSpotifyTokens());
-
-      // Sign out the user from their Google account by revoking the token
-      const googleTokens = JSON.parse(localStorage.getItem('google_tokens') || '{}');
-      if (googleTokens.access_token) {
-        await fetch(`https://accounts.google.com/o/oauth2/revoke?token=${googleTokens.access_token}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        });
-        console.log("Successfully signed out from Google account");
-      }
-
-      // Clear Spotify tokens from local storage
-      localStorage.removeItem('spotify_access_token');
-      localStorage.removeItem('spotify_refresh_token');
-
-      console.log("Successfully signed out from Spotify account");
-
-      // Redirect to the home or login page after sign-out
-      router.push('/');
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
+    await logout();
+    router.push('/');
   };
 
   const handleSettings = () => {

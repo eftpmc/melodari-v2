@@ -48,8 +48,18 @@ const playlistSlice = createSlice({
         spotifyPlaylist.songs = action.payload.songs;
       }
     },
+    clearGooglePlaylists(state) {
+      state.google = {}; // Clear all Google playlists
+    },
+    clearSpotifyPlaylists(state) {
+      state.spotify = {}; // Clear all Spotify playlists
+    },
+    clearAllPlaylists(state) {
+      state.google = {};
+      state.spotify = {};
+    },
   },
 });
 
-export const { setGooglePlaylists, setSpotifyPlaylists, setPlaylistSongs } = playlistSlice.actions;
+export const { setGooglePlaylists, setSpotifyPlaylists, setPlaylistSongs, clearGooglePlaylists, clearSpotifyPlaylists, clearAllPlaylists } = playlistSlice.actions;
 export default playlistSlice.reducer;

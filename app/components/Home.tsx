@@ -94,8 +94,6 @@ export default function Home() {
               songs: [], // Initialize songs array, you will fetch these later
             }));
 
-            console.log(transformedPlaylists)
-
             setSpotifyPlaylistsClient(transformedPlaylists);
             dispatch(setSpotifyPlaylists(transformedPlaylists));
           } else {

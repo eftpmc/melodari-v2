@@ -26,7 +26,6 @@ export async function POST(req) {
 
     try {
         const { tokens } = await oauth2Client.getToken(code);
-        console.log(tokens)
         oauth2Client.credentials = tokens;
 
         if (tokens) {

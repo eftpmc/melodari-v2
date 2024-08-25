@@ -1,11 +1,28 @@
 "use client";
 
-import { useState } from "react";
-import { FaGoogle, FaSpotify } from "react-icons/fa"; // Import the Google and Spotify icons
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { FaGoogle, FaSpotify } from "react-icons/fa"; 
+import { useAuth } from "@/contexts/AuthContext"; // Ensure this path is correct
 
 export default function Login() {
+    const router = useRouter();
+    const { isAuth, checkIfGoogleAuthenticated, checkIfSpotifyAuthenticated } = useAuth();
     const [loadingGoogle, setLoadingGoogle] = useState(false);
     const [loadingSpotify, setLoadingSpotify] = useState(false);
+
+    useEffect(() => {
+        // If user is already authenticated, redirect to home
+        const checkAuthStatus = async () => {
+            const isGoogleAuth = await checkIfGoogleAuthenticated();
+            const isSpotifyAuth = await checkIfSpotifyAuthenticated();
+            if (isGoogleAuth || isSpotifyAuth) {
+                router.push("/");
+            }
+        };
+
+        checkAuthStatus();
+    }, [router, checkIfGoogleAuthenticated, checkIfSpotifyAuthenticated]);
 
     const handleGoogleLogin = async () => {
         setLoadingGoogle(true);
@@ -20,7 +37,6 @@ export default function Login() {
 
             const data = await res.json();
             if (data.authorizeUrl) {
-                // Redirect the user to Google's OAuth 2.0 authorization page
                 window.location.href = data.authorizeUrl;
             }
         } catch (error) {
@@ -43,7 +59,6 @@ export default function Login() {
 
             const data = await res.json();
             if (data.authorizeUrl) {
-                // Redirect the user to Spotify's OAuth 2.0 authorization page
                 window.location.href = data.authorizeUrl;
             }
         } catch (error) {

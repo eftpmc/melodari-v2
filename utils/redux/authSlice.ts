@@ -1,4 +1,3 @@
-// store/authSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface Tokens {
@@ -35,8 +34,12 @@ const authSlice = createSlice({
     clearSpotifyTokens(state) {
       state.spotifyTokens = null;
     },
+    logout(state) {
+      state.googleTokens = null;
+      state.spotifyTokens = null;
+    },
   },
 });
 
-export const { setGoogleTokens, clearGoogleTokens, setSpotifyTokens, clearSpotifyTokens } = authSlice.actions;
+export const { setGoogleTokens, clearGoogleTokens, setSpotifyTokens, clearSpotifyTokens, logout } = authSlice.actions;
 export default authSlice.reducer;

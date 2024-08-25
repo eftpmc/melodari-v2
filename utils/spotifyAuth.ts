@@ -43,6 +43,29 @@ export async function exchangeSpotifyCodeForTokens(code: string) {
     return response.json();
 }
 
+export async function refreshSpotifyTokens(refresh_token: string) {
+    const authOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: 'Basic ' + Buffer.from(client_id + ':' + client_secret).toString('base64'),
+        },
+        body: querystring.stringify({
+            refresh_token: refresh_token,
+            grant_type: 'refresh_token',
+        }),
+    };
+
+    const response = await fetch('https://accounts.spotify.com/api/token', authOptions);
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to refresh token: ${response.status} ${response.statusText} - ${errorText}`);
+    }
+
+    return response.json();
+}
+
 function generateRandomString(length: number) {
     let text = '';
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

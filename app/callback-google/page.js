@@ -5,9 +5,11 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setGoogleTokens, setTokens } from '@/utils/redux/authSlice';
 import { Loader2 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function OAuth2Callback() {
   const router = useRouter();
+  const { checkIfGoogleAuthenticated } = useAuth();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
 
@@ -28,13 +30,19 @@ export default function OAuth2Callback() {
 
           const data = await res.json();
           if (data.tokens) {
-            // Dispatch the tokens to Redux
             dispatch(setGoogleTokens(data.tokens));
-            router.push('/'); // Redirect to the home page
+          
+            const isAuthenticated = await checkIfGoogleAuthenticated(); // Implement this based on your auth logic
+          
+            if (isAuthenticated) {
+              router.push('/'); // Redirect to the home page
+            } else {
+              router.push('/login'); // Redirect to login if authentication fails
+            }
           } else {
             console.error('Authentication failed:', data.message);
             router.push('/login'); // Redirect to login on failure
-          }
+          }          
         } catch (error) {
           console.error('Error exchanging code for tokens:', error);
           router.push('/login'); // Redirect to login on error

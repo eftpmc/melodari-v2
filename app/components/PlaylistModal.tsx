@@ -21,7 +21,6 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
 
   useEffect(() => {
     const fetchSongs = async () => {    
-        console.log(playlist.id)
       if (!googleTokens) {
         console.error("Google tokens are null");
         return;
