@@ -5,9 +5,11 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setSpotifyTokens } from '@/utils/redux/authSlice'; // Import the appropriate action
 import { Loader2 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SpotifyCallback() {
   const router = useRouter();
+  const { checkIfGoogleAuthenticated, checkIfSpotifyAuthenticated } = useAuth();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
 
@@ -15,8 +17,6 @@ export default function SpotifyCallback() {
     const exchangeCodeForTokens = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get('code');
-
-      console.log(code)
 
       if (code) {
         try {
@@ -29,15 +29,21 @@ export default function SpotifyCallback() {
           });
 
           const data = await res.json();
-          console.log(data)
           if (data.tokens) {
-            // Dispatch the tokens to Redux
             dispatch(setSpotifyTokens(data.tokens));
-            router.push('/'); // Redirect to the home page
+          
+            // Validate token or check if user is authenticated with the new token
+            const isAuthenticated = await checkIfSpotifyAuthenticated(); // Implement this based on your auth logic
+          
+            if (isAuthenticated) {
+              router.push('/'); // Redirect to the home page
+            } else {
+              router.push('/login'); // Redirect to login if authentication fails
+            }
           } else {
             console.error('Authentication failed:', data.message);
             router.push('/login'); // Redirect to login on failure
-          }
+          }          
         } catch (error) {
           console.error('Error exchanging code for tokens:', error);
           router.push('/login'); // Redirect to login on error
