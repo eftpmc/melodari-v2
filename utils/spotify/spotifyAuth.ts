@@ -48,11 +48,11 @@ export async function refreshSpotifyTokens(refresh_token: string) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            Authorization: 'Basic ' + Buffer.from(client_id + ':' + client_secret).toString('base64'),
         },
         body: querystring.stringify({
             refresh_token: refresh_token,
             grant_type: 'refresh_token',
+            client_id: client_id,
         }),
     };
 

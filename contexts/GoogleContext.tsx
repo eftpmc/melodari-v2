@@ -121,12 +121,7 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
         return false;
     };
 
-    const loadPlaylists = async () => {
-        if (Object.keys(storedGooglePlaylists).length > 0) {
-            setPlaylists(Object.values(storedGooglePlaylists));
-            return;
-        }
-
+    const fetchGooglePlaylists = async (): Promise<Playlist[] | null> => {
         if (googleTokens?.access_token) {
             try {
                 const res = await fetch('https://www.googleapis.com/youtube/v3/playlists?part=snippet&mine=true&maxResults=50', {
@@ -139,7 +134,7 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
 
                 if (res.ok) {
                     const data: PlaylistsResponse = await res.json();
-                    const transformedPlaylists = data.items.map((playlist) => ({
+                    const transformedPlaylists: Playlist[] = data.items.map((playlist) => ({
                         id: playlist.id,
                         title: playlist.snippet.title,
                         accountName: playlist.snippet.channelTitle,
@@ -152,12 +147,11 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
                         },
                         songs: [], // songs will be loaded separately
                     }));
-                    dispatch(UpdateGooglePlaylists(transformedPlaylists));
-                    setPlaylists(transformedPlaylists);
+                    return transformedPlaylists;
                 } else if (res.status === 401) { // Unauthorized
                     const refreshed = await refreshGoogleTokens();
                     if (refreshed) {
-                        await loadPlaylists(); // Retry with the new token
+                        return await fetchGooglePlaylists(); // Retry with the new token
                     }
                 } else {
                     console.error('Failed to fetch Google playlists:', res.statusText);
@@ -165,6 +159,46 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
             } catch (error) {
                 console.error('Error fetching Google playlists:', error);
             }
+        }
+        return null;
+    };
+
+    const validatePlaylists = (playlists: Playlist[]): Playlist[] => {
+        const uniquePlaylists: { [id: string]: Playlist } = {};
+
+        playlists.forEach((playlist) => {
+            if (!uniquePlaylists[playlist.id]) {
+                uniquePlaylists[playlist.id] = playlist;
+            } else {
+                console.warn(`Duplicate playlist found: ${playlist.title}`);
+            }
+
+            // Ensure all necessary information is present
+            if (!playlist.title || !playlist.id || !playlist.source) {
+                console.error(`Playlist is missing essential information: ${playlist.id}`);
+            }
+        });
+
+        return Object.values(uniquePlaylists);
+    };
+
+    const loadPlaylists = async () => {
+        let validatedPlaylists: Playlist[] = [];
+
+        // Validate stored playlists
+        if (Object.keys(storedGooglePlaylists).length > 0) {
+            validatedPlaylists = validatePlaylists(Object.values(storedGooglePlaylists));
+            setPlaylists(validatedPlaylists);
+        }
+
+        // Fetch new playlists if necessary and validate them
+        const fetchedPlaylists = await fetchGooglePlaylists();
+
+        if (fetchedPlaylists) {
+            const newValidatedPlaylists = validatePlaylists(fetchedPlaylists);
+            validatedPlaylists = [...validatedPlaylists, ...newValidatedPlaylists];
+            dispatch(UpdateGooglePlaylists(validatedPlaylists));
+            setPlaylists(validatedPlaylists);
         }
     };
 

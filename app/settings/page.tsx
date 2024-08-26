@@ -3,15 +3,17 @@
 import React, { useState } from 'react';
 import { useSpotifyContext } from '@/contexts/SpotifyContext';
 import { useGoogleContext } from '@/contexts/GoogleContext';
-import { FaSpotify, FaYoutube } from 'react-icons/fa';
+import { FaSpotify } from 'react-icons/fa';
 import { SiYoutubemusic } from "react-icons/si";
 
 const SettingsPage = () => {
-  const { isGoogleAuth, logoutGoogle, playlists: googlePlaylists } = useGoogleContext();
-  const { isSpotifyAuth, logoutSpotify, playlists: spotifyPlaylists } = useSpotifyContext();
+  const { isGoogleAuth, logoutGoogle, playlists: googlePlaylists, checkIfGoogleAuthenticated } = useGoogleContext();
+  const { isSpotifyAuth, logoutSpotify, playlists: spotifyPlaylists, checkIfSpotifyAuthenticated } = useSpotifyContext();
 
   const [loadingGoogle, setLoadingGoogle] = useState(false);
   const [loadingSpotify, setLoadingSpotify] = useState(false);
+  const [googleStatus, setGoogleStatus] = useState('');
+  const [spotifyStatus, setSpotifyStatus] = useState('');
 
   const handleGoogleLogin = async () => {
     setLoadingGoogle(true);
@@ -53,6 +55,26 @@ const SettingsPage = () => {
     }
   };
 
+  const checkGoogleAuthStatus = async () => {
+    const authenticated = await checkIfGoogleAuthenticated();
+    setGoogleStatus(authenticated ? "Authenticated" : "Re-authentication required");
+  };
+
+  const checkSpotifyAuthStatus = async () => {
+    const authenticated = await checkIfSpotifyAuthenticated();
+    setSpotifyStatus(authenticated ? "Authenticated" : "Re-authentication required");
+  };
+
+  React.useEffect(() => {
+    if (isGoogleAuth) {
+      checkGoogleAuthStatus();
+    }
+
+    if (isSpotifyAuth) {
+      checkSpotifyAuthStatus();
+    }
+  }, [isGoogleAuth, isSpotifyAuth]);
+
   const googleAccountName = googlePlaylists[0]?.accountName || "YouTube Music";
   const spotifyAccountName = spotifyPlaylists[0]?.accountName || "Spotify";
 
@@ -68,7 +90,7 @@ const SettingsPage = () => {
             <h3 className="text-lg font-semibold text-base-content">{googleAccountName}</h3>
             <p className="text-sm text-gray-500">
               {isGoogleAuth
-                ? "Connected"
+                ? googleStatus
                 : googlePlaylists.length > 0
                   ? "Not Connected (Playlists available)"
                   : "Not Connected"}
@@ -76,7 +98,7 @@ const SettingsPage = () => {
           </div>
           <button
             onClick={isGoogleAuth ? logoutGoogle : handleGoogleLogin}
-            className={`btn btn-sm text-base-200 ${isGoogleAuth ? "btn-error" : googlePlaylists.length > 0 ? "btn-warning" : "btn-success"
+            className={`btn btn-sm text-base-200 ${isGoogleAuth ? "btn-error" : googlePlaylists.length > 0 ? "btn-base-content" : "btn-success"
               }`}
             disabled={loadingGoogle}
           >
@@ -84,7 +106,7 @@ const SettingsPage = () => {
               ? "Connecting..."
               : isGoogleAuth
                 ? "Disconnect"
-                : "Update Playlists"}
+                : "Connect"}
           </button>
         </div>
 
@@ -95,7 +117,7 @@ const SettingsPage = () => {
             <h3 className="text-lg font-semibold text-base-content">{spotifyAccountName}</h3>
             <p className="text-sm text-gray-500">
               {isSpotifyAuth
-                ? "Connected"
+                ? spotifyStatus
                 : spotifyPlaylists.length > 0
                   ? "Not Connected (Playlists available)"
                   : "Not Connected"}
@@ -111,7 +133,7 @@ const SettingsPage = () => {
               ? "Connecting..."
               : isSpotifyAuth
                 ? "Disconnect"
-                : "Update Playlists"}
+                : "Connect"}
           </button>
         </div>
       </div>
