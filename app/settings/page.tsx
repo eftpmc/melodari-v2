@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useSpotifyContext } from '@/contexts/SpotifyContext';
 import { useGoogleContext } from '@/contexts/GoogleContext';
 import { FaSpotify, FaYoutube } from 'react-icons/fa';
+import { SiYoutubemusic } from "react-icons/si";
 
 const SettingsPage = () => {
   const { isGoogleAuth, logoutGoogle, playlists: googlePlaylists } = useGoogleContext();
@@ -62,7 +63,7 @@ const SettingsPage = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Google Account Connection */}
         <div className="flex items-center p-4 bg-base-100 rounded-lg shadow">
-          <FaYoutube className="w-8 h-8 text-red-600 mr-4" />
+          <SiYoutubemusic className="w-8 h-8 text-red-600 mr-4" />
           <div className="flex-1">
             <h3 className="text-lg font-semibold text-base-content">{googleAccountName}</h3>
             <p className="text-sm text-gray-500">

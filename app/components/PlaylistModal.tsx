@@ -1,7 +1,10 @@
+"use client";
+
 import React, { useEffect, useState } from 'react';
 import { Playlist, Song } from '@/types';
 import { useGoogleContext } from '@/contexts/GoogleContext';
 import { useSpotifyContext } from '@/contexts/SpotifyContext';
+import SongItem from './SongItem';
 
 interface PlaylistModalProps {
   playlist: Playlist;
@@ -13,6 +16,7 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
   const { fetchSongsForPlaylist: fetchSpotifySongs } = useSpotifyContext();
   const [loading, setLoading] = useState(true);
   const [songs, setSongs] = useState<Song[]>([]);
+  const [openSongIndex, setOpenSongIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const loadSongs = async () => {
@@ -28,6 +32,10 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
 
     loadSongs();
   }, [playlist]);
+
+  const handleSongClick = (index: number) => {
+    setOpenSongIndex(openSongIndex === index ? null : index);
+  };
 
   if (!playlist) return null;
 
@@ -47,7 +55,7 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
             />
             <div className="ml-4 flex-1">
               <h3 className="text-xl font-bold text-base-content">{playlist.title}</h3>
-              <p className="text-sm text-gray-500">{playlist.accountName}</p> {/* Display the account name */}
+              <p className="text-sm text-gray-500">{playlist.accountName}</p>
               <p className="text-sm text-gray-500">{playlist.description}</p>
             </div>
           </div>
@@ -56,9 +64,13 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
           ) : songs && songs.length > 0 ? (
             <ul className="space-y-2 max-h-80 overflow-y-auto border-t border-base-200 pt-2">
               {songs.map((song, index) => (
-                <li key={song.id} className="text-base-content">
-                  <b>{song.title}</b> by {song.artist}
-                </li>
+                <SongItem
+                  key={song.id}
+                  song={song}
+                  index={index}
+                  isOpen={openSongIndex === index}
+                  onClick={() => handleSongClick(index)}
+                />
               ))}
             </ul>
           ) : (
