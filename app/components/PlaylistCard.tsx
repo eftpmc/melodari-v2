@@ -10,7 +10,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({ playlist, onClick }) => {
   return (
     <label
       htmlFor="playlist-modal"
-      className="bg-base-100 p-4 rounded-lg shadow-md w-contain m-1 flex items-center cursor-pointer"
+      className="bg-base-100 p-4 rounded-lg shadow-md w-contain flex items-center cursor-pointer"
       onClick={onClick} // Open the modal when the card is clicked
     >
       {playlist.thumbnails.medium && (

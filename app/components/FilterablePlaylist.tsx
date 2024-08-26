@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Playlist } from '@/types';
 import PlaylistCard from './PlaylistCard';
 import PlaylistModal from './PlaylistModal';
@@ -13,6 +13,16 @@ interface FilterablePlaylistProps {
 export default function FilterablePlaylist({ googlePlaylists, spotifyPlaylists }: FilterablePlaylistProps) {
   const [filter, setFilter] = useState<'All' | 'YouTube Music' | 'Spotify'>('All');
   const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading time
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 125); // Adjust the timing as needed
+
+    return () => clearTimeout(timeout);
+  }, []);
 
   const getFilteredPlaylists = () => {
     if (filter === 'YouTube Music') {
@@ -37,18 +47,40 @@ export default function FilterablePlaylist({ googlePlaylists, spotifyPlaylists }
   return (
     <div className="p-8">
       <div className="flex space-x-4 mb-4">
-        <span className={`badge cursor-pointer ${filter === 'All' ? 'badge-primary' : ''}`} onClick={() => setFilter('All')}>
+        <span
+          className={`badge cursor-pointer ${filter === 'All' ? 'badge-primary' : ''}`}
+          onClick={() => setFilter('All')}
+        >
           All
         </span>
-        <span className={`badge cursor-pointer ${filter === 'YouTube Music' ? 'badge-primary' : ''}`} onClick={() => setFilter('YouTube Music')}>
+        <span
+          className={`badge cursor-pointer ${filter === 'YouTube Music' ? 'badge-primary' : ''}`}
+          onClick={() => setFilter('YouTube Music')}
+        >
           YouTube Music
         </span>
-        <span className={`badge cursor-pointer ${filter === 'Spotify' ? 'badge-primary' : ''}`} onClick={() => setFilter('Spotify')}>
+        <span
+          className={`badge cursor-pointer ${filter === 'Spotify' ? 'badge-primary' : ''}`}
+          onClick={() => setFilter('Spotify')}
+        >
           Spotify
         </span>
       </div>
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {filteredPlaylists.length > 0 ? (
+      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+        {loading ? (
+          // Display skeletons while loading
+          Array(6)
+            .fill(0)
+            .map((_, index) => (
+              <div key={index} className="bg-base-200 p-4 rounded-lg shadow-md w-full flex items-center space-x-4">
+                <div className="w-12 h-12 bg-base-300 rounded-lg skeleton" />
+                <div className="flex-1">
+                  <div className="h-6 bg-base-300 rounded skeleton w-3/4" />
+                  <div className="h-4 bg-base-300 rounded skeleton w-1/2" />
+                </div>
+              </div>
+            ))
+        ) : filteredPlaylists.length > 0 ? (
           filteredPlaylists.map((playlist) => (
             <PlaylistCard 
               key={playlist.id} 
@@ -57,7 +89,9 @@ export default function FilterablePlaylist({ googlePlaylists, spotifyPlaylists }
             />
           ))
         ) : (
-          <div className="bg-base-200 p-4 rounded-lg shadow-md w-full my-2 flex items-center text-base-content">No playlists found.</div>
+          <div className="bg-base-200 p-4 rounded-lg shadow-md w-full my-2 flex items-center text-base-content">
+            No playlists found.
+          </div>
         )}
       </div>
 

@@ -12,30 +12,32 @@ interface PlaylistsState {
 
 const initialState: PlaylistsState = {
   google: {},
-  spotify: {}, // Initialize with an empty object to avoid undefined issues
+  spotify: {},
 };
 
 const playlistSlice = createSlice({
   name: 'playlists',
   initialState,
   reducers: {
-    setGooglePlaylists(state, action: PayloadAction<Playlist[]>) {
+    UpdateGooglePlaylists(state, action: PayloadAction<Playlist[]>) {
       action.payload.forEach((playlist) => {
         state.google[playlist.id] = {
+          ...state.google[playlist.id], // Merge with existing playlist data if present
           ...playlist,
-          songs: [], // Initialize with empty songs array
+          songs: state.google[playlist.id]?.songs || [], // Preserve existing songs if already loaded
         };
       });
     },
-    setSpotifyPlaylists(state, action: PayloadAction<Playlist[]>) {
+    UpdateSpotifyPlaylists(state, action: PayloadAction<Playlist[]>) {
       action.payload.forEach((playlist) => {
         state.spotify[playlist.id] = {
+          ...state.spotify[playlist.id],
           ...playlist,
-          songs: [], // Initialize with empty songs array
+          songs: state.spotify[playlist.id]?.songs || [],
         };
       });
     },
-    setPlaylistSongs(
+    UpdatePlaylistSongs(
       state,
       action: PayloadAction<{ playlistId: string; songs: Song[] }>
     ) {
@@ -43,16 +45,16 @@ const playlistSlice = createSlice({
       const spotifyPlaylist = state.spotify[action.payload.playlistId];
 
       if (googlePlaylist) {
-        googlePlaylist.songs = action.payload.songs;
+        googlePlaylist.songs = [...googlePlaylist.songs, ...action.payload.songs]; // Merge new songs with existing ones
       } else if (spotifyPlaylist) {
-        spotifyPlaylist.songs = action.payload.songs;
+        spotifyPlaylist.songs = [...spotifyPlaylist.songs, ...action.payload.songs];
       }
     },
     clearGooglePlaylists(state) {
-      state.google = {}; // Clear all Google playlists
+      state.google = {};
     },
     clearSpotifyPlaylists(state) {
-      state.spotify = {}; // Clear all Spotify playlists
+      state.spotify = {};
     },
     clearAllPlaylists(state) {
       state.google = {};
@@ -61,5 +63,13 @@ const playlistSlice = createSlice({
   },
 });
 
-export const { setGooglePlaylists, setSpotifyPlaylists, setPlaylistSongs, clearGooglePlaylists, clearSpotifyPlaylists, clearAllPlaylists } = playlistSlice.actions;
+export const {
+  UpdateGooglePlaylists,
+  UpdateSpotifyPlaylists,
+  UpdatePlaylistSongs,
+  clearGooglePlaylists,
+  clearSpotifyPlaylists,
+  clearAllPlaylists,
+} = playlistSlice.actions;
+
 export default playlistSlice.reducer;

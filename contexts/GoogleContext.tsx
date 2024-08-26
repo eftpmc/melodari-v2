@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/utils/redux/store';
 import { clearGoogleTokens, setGoogleTokens } from '@/utils/redux/authSlice';
-import { clearGooglePlaylists, setGooglePlaylists, setPlaylistSongs } from '@/utils/redux/playlistSlice';
+import { clearGooglePlaylists, UpdateGooglePlaylists, UpdatePlaylistSongs } from '@/utils/redux/playlistSlice';
 import { Playlist, Song, Tokens } from '@/types';
 
 interface PlaylistsResponse {
@@ -152,7 +152,7 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
                         },
                         songs: [], // songs will be loaded separately
                     }));
-                    dispatch(setGooglePlaylists(transformedPlaylists));
+                    dispatch(UpdateGooglePlaylists(transformedPlaylists));
                     setPlaylists(transformedPlaylists);
                 } else if (res.status === 401) { // Unauthorized
                     const refreshed = await refreshGoogleTokens();
@@ -199,7 +199,7 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
                             high: item.snippet.thumbnails.high.url,
                         },
                     }));
-                    dispatch(setPlaylistSongs({ playlistId, songs: fetchedSongs }));
+                    dispatch(UpdatePlaylistSongs({ playlistId, songs: fetchedSongs }));
 
                     setPlaylists(prevPlaylists => prevPlaylists.map(p => 
                         p.id === playlistId ? { ...p, songs: fetchedSongs } : p

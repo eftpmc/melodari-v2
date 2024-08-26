@@ -44,23 +44,54 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
       <input type="checkbox" id="playlist-modal" className="modal-toggle" />
       <div className="modal modal-open p-6">
         <div className="modal-box relative max-w-2xl w-full p-4">
-          <label htmlFor="playlist-modal" className="btn btn-sm btn-circle absolute right-2 top-2" onClick={onClose}>
+          <label
+            htmlFor="playlist-modal"
+            className="btn btn-sm btn-circle absolute right-2 top-2"
+            onClick={onClose}
+          >
             ✕
           </label>
           <div className="flex items-start mb-4">
-            <img
-              src={playlist.thumbnails.medium || playlist.thumbnails.default}
-              alt={playlist.title}
-              className="w-24 h-24 object-cover rounded-lg"
-            />
+            {loading ? (
+              <div className="w-24 h-24 bg-base-200 rounded-lg skeleton" />
+            ) : (
+              <img
+                src={playlist.thumbnails.medium || playlist.thumbnails.default}
+                alt={playlist.title}
+                className="w-24 h-24 object-cover rounded-lg"
+              />
+            )}
             <div className="ml-4 flex-1">
-              <h3 className="text-xl font-bold text-base-content">{playlist.title}</h3>
-              <p className="text-sm text-gray-500">{playlist.accountName}</p>
-              <p className="text-sm text-gray-500">{playlist.description}</p>
+              {loading ? (
+                <>
+                  <div className="h-6 bg-base-200 rounded w-3/4 skeleton mb-2" />
+                  <div className="h-4 bg-base-200 rounded w-1/2 skeleton mb-1" />
+                  <div className="h-4 bg-base-200 rounded w-2/3 skeleton" />
+                </>
+              ) : (
+                <>
+                  <h3 className="text-xl font-bold text-base-content">
+                    {playlist.title}
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    {playlist.accountName}
+                  </p>
+                  <p className="text-sm text-gray-500">{playlist.description}</p>
+                </>
+              )}
             </div>
           </div>
           {loading ? (
-            <p className="text-center">Loading...</p>
+            <ul className="space-y-2 max-h-80 overflow-y-auto border-t border-base-200 pt-2">
+              {Array(5)
+                .fill(0)
+                .map((_, index) => (
+                  <li key={index} className="flex items-center p-2">
+                    <div className="h-4 bg-base-200 rounded w-1/4 skeleton" />
+                    <div className="h-4 bg-base-200 rounded w-1/2 ml-4 skeleton" />
+                  </li>
+                ))}
+            </ul>
           ) : songs && songs.length > 0 ? (
             <ul className="space-y-2 max-h-80 overflow-y-auto border-t border-base-200 pt-2">
               {songs.map((song, index) => (

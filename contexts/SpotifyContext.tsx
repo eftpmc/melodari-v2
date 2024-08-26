@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/utils/redux/store';
 import { clearSpotifyTokens, setSpotifyTokens } from '@/utils/redux/authSlice';
-import { clearSpotifyPlaylists, setSpotifyPlaylists, setPlaylistSongs } from '@/utils/redux/playlistSlice';
+import { clearSpotifyPlaylists, UpdateSpotifyPlaylists, UpdatePlaylistSongs } from '@/utils/redux/playlistSlice';
 import { Playlist, Song, Tokens } from '@/types';
 
 interface PlaylistsResponse {
@@ -142,7 +142,7 @@ export const SpotifyProvider = ({ children }: SpotifyProviderProps) => {
                         },
                         songs: [], // songs will be loaded separately
                     }));
-                    dispatch(setSpotifyPlaylists(transformedPlaylists));
+                    dispatch(UpdateSpotifyPlaylists(transformedPlaylists));
                     setPlaylists(transformedPlaylists);
                 } else if (res.status === 401) { // Unauthorized
                     const refreshed = await refreshSpotifyTokens();
@@ -187,7 +187,7 @@ export const SpotifyProvider = ({ children }: SpotifyProviderProps) => {
                         },
                         artists: item.track.artists.map((artist: any) => artist.name),
                     }));
-                    dispatch(setPlaylistSongs({ playlistId, songs: fetchedSongs }));
+                    dispatch(UpdatePlaylistSongs({ playlistId, songs: fetchedSongs }));
 
                     setPlaylists(prevPlaylists => prevPlaylists.map(p =>
                         p.id === playlistId ? { ...p, songs: fetchedSongs } : p
