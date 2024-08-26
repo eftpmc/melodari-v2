@@ -5,11 +5,11 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setSpotifyTokens } from '@/utils/redux/authSlice'; // Import the appropriate action
 import { Loader2 } from "lucide-react";
-import { useSpotifyAuth } from "@/contexts/SpotifyAuthContext";
+import { useSpotifyContext } from "@/contexts/SpotifyContext";
 
 export default function SpotifyCallback() {
   const router = useRouter();
-  const { checkIfSpotifyAuthenticated } = useSpotifyAuth();
+  const { checkIfSpotifyAuthenticated } = useSpotifyContext();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
 

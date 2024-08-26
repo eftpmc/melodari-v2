@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '@/utils/redux/store';
 import { Playlist, Song } from '@/types';
-import { fetchGooglePlaylistSongs } from '@/utils/google/googleService';
-import { fetchSpotifyPlaylistSongs } from '@/utils/spotify/spotifyService';
+import { useGoogleContext } from '@/contexts/GoogleContext';
+import { useSpotifyContext } from '@/contexts/SpotifyContext';
 
 interface PlaylistModalProps {
   playlist: Playlist;
@@ -11,59 +9,63 @@ interface PlaylistModalProps {
 }
 
 const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
-  const dispatch = useDispatch();
+  const { fetchSongsForPlaylist: fetchGoogleSongs } = useGoogleContext();
+  const { fetchSongsForPlaylist: fetchSpotifySongs } = useSpotifyContext();
   const [loading, setLoading] = useState(true);
-  
-  // Retrieve tokens and songs from the Redux store
-  const googleTokens = useSelector((state: RootState) => state.auth.googleTokens);
-  const spotifyTokens = useSelector((state: RootState) => state.auth.spotifyTokens);
-  const googleSongs = useSelector((state: RootState) => state.playlists.google[playlist.id]?.songs);
-  const spotifySongs = useSelector((state: RootState) => state.playlists.spotify[playlist.id]?.songs);
+  const [songs, setSongs] = useState<Song[]>([]);
 
   useEffect(() => {
     const loadSongs = async () => {
-      if (googleTokens) {
-        await fetchGooglePlaylistSongs(googleTokens.access_token, playlist.id, dispatch);
-      } else if (spotifyTokens) {
-        await fetchSpotifyPlaylistSongs(spotifyTokens.access_token, playlist.id, dispatch);
+      if (playlist.source === 'google') {
+        const fetchedSongs = await fetchGoogleSongs(playlist.id);
+        setSongs(fetchedSongs);
+      } else if (playlist.source === 'spotify') {
+        const fetchedSongs = await fetchSpotifySongs(playlist.id);
+        setSongs(fetchedSongs);
       }
       setLoading(false);
     };
 
     loadSongs();
-  }, [dispatch, playlist.id, googleSongs, spotifySongs, googleTokens, spotifyTokens]);
+  }, [playlist]);
 
   if (!playlist) return null;
 
-  const songs = googleTokens ? googleSongs : spotifyTokens ? spotifySongs : [];
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-base-100 p-6 rounded-lg shadow-lg max-w-lg w-full">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-base-content">{playlist.title}</h2>
-          <button onClick={onClose} className="text-base-content text-xl">&times;</button>
+    <>
+      <input type="checkbox" id="playlist-modal" className="modal-toggle" />
+      <div className="modal modal-open">
+        <div className="modal-box relative max-w-2xl w-full p-4">
+          <label htmlFor="playlist-modal" className="btn btn-sm btn-circle absolute right-2 top-2" onClick={onClose}>
+            ✕
+          </label>
+          <div className="flex items-start mb-4">
+            <img
+              src={playlist.thumbnails.medium || playlist.thumbnails.default}
+              alt={playlist.title}
+              className="w-24 h-24 object-cover rounded-lg"
+            />
+            <div className="ml-4 flex-1">
+              <h3 className="text-xl font-bold text-base-content">{playlist.title}</h3>
+              <p className="text-sm text-gray-500">{playlist.description}</p>
+            </div>
+          </div>
+          {loading ? (
+            <p className="text-center">Loading...</p>
+          ) : songs && songs.length > 0 ? (
+            <ul className="space-y-2 max-h-80 overflow-y-auto border-t border-base-200 pt-2">
+              {songs.map((song, index) => (
+                <li key={song.id} className="text-base-content">
+                  {index + 1}. {song.title} {song.artists ? `by ${song.artists.join(', ')}` : ''}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-center">No songs available</p>
+          )}
         </div>
-        <img
-          src={playlist.thumbnails.high}
-          alt={playlist.title}
-          className="w-full h-auto object-cover rounded-lg mb-4"
-        />
-        {loading ? (
-          <p className="text-center text-base-content">Loading...</p>
-        ) : songs && songs.length > 0 ? (
-          <ul className="space-y-2">
-            {songs.map((song, index) => (
-              <li key={song.id} className="text-base-content">
-                {index + 1}. {song.title} {song.artists ? `by ${song.artists.join(', ')}` : ''}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-center text-base-content">No songs available</p>
-        )}
       </div>
-    </div>
+    </>
   );
 };
 

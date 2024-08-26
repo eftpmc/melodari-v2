@@ -3,13 +3,13 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaGoogle, FaSpotify } from "react-icons/fa"; 
-import { useGoogleAuth } from "@/contexts/GoogleAuthContext";
-import { useSpotifyAuth } from "@/contexts/SpotifyAuthContext";
+import { useGoogleContext } from "@/contexts/GoogleContext";
+import { useSpotifyContext } from "@/contexts/SpotifyContext";
 
 export default function Login() {
     const router = useRouter();
-    const {checkIfGoogleAuthenticated} = useGoogleAuth();
-    const {checkIfSpotifyAuthenticated} = useSpotifyAuth();
+    const {checkIfGoogleAuthenticated} = useGoogleContext();
+    const {checkIfSpotifyAuthenticated} = useSpotifyContext();
     const [loadingGoogle, setLoadingGoogle] = useState(false);
     const [loadingSpotify, setLoadingSpotify] = useState(false);
 

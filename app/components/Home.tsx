@@ -1,46 +1,24 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '@/utils/redux/store';
-import { fetchGooglePlaylists } from '@/utils/google/googleService';
-import { fetchSpotifyPlaylists } from '@/utils/spotify/spotifyService';
+import { useGoogleContext } from '@/contexts/GoogleContext';
+import { useSpotifyContext } from '@/contexts/SpotifyContext';
 import FilterablePlaylist from '@/app/components/FilterablePlaylist';
-import { Playlist } from '@/types';
 
 export default function Home() {
   const router = useRouter();
-  const dispatch = useDispatch();
-  const googleTokens = useSelector((state: RootState) => state.auth.googleTokens);
-  const spotifyTokens = useSelector((state: RootState) => state.auth.spotifyTokens);
-  const storedGooglePlaylists = useSelector((state: RootState) => state.playlists.google);
-  const storedSpotifyPlaylists = useSelector((state: RootState) => state.playlists.spotify); 
-
-  const [googlePlaylists, setGooglePlaylists] = useState<Playlist[]>([]);
-  const [spotifyPlaylists, setSpotifyPlaylists] = useState<Playlist[]>([]);
+  const { isGoogleAuth, playlists: googlePlaylists } = useGoogleContext();
+  const { isSpotifyAuth, playlists: spotifyPlaylists } = useSpotifyContext();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!googleTokens && !spotifyTokens) {
+    if (!isGoogleAuth && !isSpotifyAuth) {
       router.push('/login');
       return;
     }
 
-    const loadPlaylists = async () => {
-      if (googleTokens) {
-        await fetchGooglePlaylists(googleTokens.access_token, storedGooglePlaylists, dispatch);
-        setGooglePlaylists(Object.values(storedGooglePlaylists));
-      }
-
-      if (spotifyTokens) {
-        await fetchSpotifyPlaylists(spotifyTokens.access_token, storedSpotifyPlaylists, dispatch);
-        setSpotifyPlaylists(Object.values(storedSpotifyPlaylists));
-      }
-
-      setLoading(false);
-    };
-
-    loadPlaylists();
-  }, [googleTokens, spotifyTokens, router, dispatch, storedGooglePlaylists, storedSpotifyPlaylists]);
+    // Once both contexts have loaded their playlists, we can stop showing the loading state
+    setLoading(false);
+  }, [isGoogleAuth, isSpotifyAuth, router]);
 
   if (loading) {
     return (

@@ -1,8 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useGoogleAuth, GoogleAuthProvider } from './GoogleAuthContext';
-import { useSpotifyAuth, SpotifyAuthProvider } from './SpotifyAuthContext';
+import { useGoogleContext, GoogleProvider } from './GoogleContext';
+import { useSpotifyContext, SpotifyProvider } from './SpotifyContext';
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -16,8 +16,8 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-    const { isGoogleAuth, logoutGoogle, checkIfGoogleAuthenticated } = useGoogleAuth();
-    const { isSpotifyAuth, logoutSpotify, checkIfSpotifyAuthenticated } = useSpotifyAuth();
+    const { isGoogleAuth, logoutGoogle, checkIfGoogleAuthenticated } = useGoogleContext();
+    const { isSpotifyAuth, logoutSpotify, checkIfSpotifyAuthenticated } = useSpotifyContext();
     const [isAuth, setIsAuth] = useState<boolean>(isGoogleAuth || isSpotifyAuth);
 
     useEffect(() => {

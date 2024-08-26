@@ -23,7 +23,7 @@ export default function RootLayout({
       <ClientProvider>
         <body className={`${inter.className} min-h-screen flex flex-col overflow-x-hidden`}>
           <header
-            className="w-full bg-base-300 text-base-content p-4 pt-8 flex justify-between items-center z-20 relative"
+            className="w-full bg-base-300 text-base-content p-4 pt-8 flex justify-between items-center z-10 relative"
             style={{ height: "60px" }}
           >
             <Link href="/" passHref>

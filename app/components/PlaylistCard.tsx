@@ -3,12 +3,13 @@ import { Playlist } from '@/types';
 
 interface PlaylistCardProps {
   playlist: Playlist;
-  onClick: () => void; // Add an onClick prop to handle opening the modal
+  onClick: () => void; // Handle opening the modal
 }
 
 const PlaylistCard: React.FC<PlaylistCardProps> = ({ playlist, onClick }) => {
   return (
-    <div
+    <label
+      htmlFor="playlist-modal"
       className="bg-base-100 p-4 rounded-lg shadow-md w-contain m-1 flex items-center cursor-pointer"
       onClick={onClick} // Open the modal when the card is clicked
     >
@@ -23,7 +24,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({ playlist, onClick }) => {
         <div className="text-base-content font-semibold">{playlist.title}</div>
         <div className="text-sm text-gray-500">{/* Additional Info (e.g., Author) */}</div>
       </div>
-    </div>
+    </label>
   );
 };
 

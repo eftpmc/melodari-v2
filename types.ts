@@ -4,6 +4,14 @@ export interface Image {
     height: number;
 }
 
+export interface Tokens {
+    access_token: string;
+    refresh_token?: string;
+    scope?: string;
+    token_type?: string;
+    expiry_date?: number;
+  }
+
 export interface Song {
     id: string;
     title: string;
@@ -20,6 +28,7 @@ export interface Song {
 export interface Playlist {
     id: string;
     title: string;
+    source: string;
     description?: string; // Optional description field
     thumbnails: {
       default: string;

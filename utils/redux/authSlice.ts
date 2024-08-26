@@ -1,12 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-interface Tokens {
-  access_token: string;
-  refresh_token?: string;
-  scope?: string;
-  token_type?: string;
-  expiry_date?: number;
-}
+import {Tokens} from '@/types'
 
 interface AuthState {
   googleTokens: Tokens | null;
