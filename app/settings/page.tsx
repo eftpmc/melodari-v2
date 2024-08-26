@@ -65,7 +65,7 @@ const SettingsPage = () => {
         <div className="flex items-center p-4 bg-base-100 rounded-lg shadow">
           <FaYoutube className="w-8 h-8 text-red-600 mr-4" />
           <div className="flex-1">
-            <h3 className="text-lg font-semibold text-base-content">YouTube Music</h3>
+            <h3 className="text-lg font-semibold text-base-content">YT Music</h3>
             <p className="text-sm text-gray-500">
               {isGoogleAuth
                 ? "Connected"
