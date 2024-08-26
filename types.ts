@@ -20,7 +20,7 @@ export interface Song {
       medium: string;
       high: string;
     };
-    artists?: string[];  // Optional artists field
+    artist: string;  // Optional artists field
   }
 
 // Playlist type to represent the playlist itself, including an array of Song

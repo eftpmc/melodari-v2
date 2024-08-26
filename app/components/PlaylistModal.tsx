@@ -18,6 +18,7 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
     const loadSongs = async () => {
       if (playlist.source === 'google') {
         const fetchedSongs = await fetchGoogleSongs(playlist.id);
+        console.log(fetchedSongs)
         setSongs(fetchedSongs);
       } else if (playlist.source === 'spotify') {
         const fetchedSongs = await fetchSpotifySongs(playlist.id);
@@ -34,7 +35,7 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
   return (
     <>
       <input type="checkbox" id="playlist-modal" className="modal-toggle" />
-      <div className="modal modal-open">
+      <div className="modal modal-open p-6">
         <div className="modal-box relative max-w-2xl w-full p-4">
           <label htmlFor="playlist-modal" className="btn btn-sm btn-circle absolute right-2 top-2" onClick={onClose}>
             ✕
@@ -56,7 +57,7 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
             <ul className="space-y-2 max-h-80 overflow-y-auto border-t border-base-200 pt-2">
               {songs.map((song, index) => (
                 <li key={song.id} className="text-base-content">
-                  {index + 1}. {song.title} {song.artists ? `by ${song.artists.join(', ')}` : ''}
+                  <b>{song.title}</b> by {song.artist}
                 </li>
               ))}
             </ul>

@@ -191,6 +191,7 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
                     const fetchedSongs: Song[] = data.items.map((item: any) => ({
                         id: item.snippet.resourceId.videoId,
                         title: item.snippet.title,
+                        artist: item.snippet.videoOwnerChannelTitle,
                         thumbnails: {
                             default: item.snippet.thumbnails.default.url,
                             medium: item.snippet.thumbnails.medium.url,

@@ -178,6 +178,7 @@ export const SpotifyProvider = ({ children }: SpotifyProviderProps) => {
                     const fetchedSongs: Song[] = data.items.map((item: any) => ({
                         id: item.track.id,
                         title: item.track.name,
+                        artist: item.track.artists[0].name,
                         thumbnails: {
                             default: item.track.album.images[0]?.url || '',
                             medium: item.track.album.images[0]?.url || '',
