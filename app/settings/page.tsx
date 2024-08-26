@@ -75,7 +75,7 @@ const SettingsPage = () => {
           </div>
           <button
             onClick={isGoogleAuth ? logoutGoogle : handleGoogleLogin}
-            className={`btn btn-sm ${isGoogleAuth ? "btn-error" : googlePlaylists.length > 0 ? "btn-warning" : "btn-success"
+            className={`btn btn-sm text-base-200 ${isGoogleAuth ? "btn-error" : googlePlaylists.length > 0 ? "btn-warning" : "btn-success"
               }`}
             disabled={loadingGoogle}
           >
@@ -102,7 +102,7 @@ const SettingsPage = () => {
           </div>
           <button
             onClick={isSpotifyAuth ? logoutSpotify : handleSpotifyLogin}
-            className={`btn btn-sm ${isSpotifyAuth ? "btn-error" : spotifyPlaylists.length > 0 ? "btn-warning" : "btn-success"
+            className={`btn btn-sm text-base-200 ${isSpotifyAuth ? "btn-error" : spotifyPlaylists.length > 0 ? "btn-warning" : "btn-success"
               }`}
             disabled={loadingSpotify}
           >
