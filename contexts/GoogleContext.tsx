@@ -142,6 +142,7 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
                     const transformedPlaylists = data.items.map((playlist) => ({
                         id: playlist.id,
                         title: playlist.snippet.title,
+                        accountName: playlist.snippet.channelTitle,
                         source: "google",
                         description: playlist.snippet.description,
                         thumbnails: {

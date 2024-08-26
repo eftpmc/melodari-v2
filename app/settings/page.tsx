@@ -4,14 +4,10 @@ import React, { useState } from 'react';
 import { useSpotifyContext } from '@/contexts/SpotifyContext';
 import { useGoogleContext } from '@/contexts/GoogleContext';
 import { FaSpotify, FaYoutube } from 'react-icons/fa';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/utils/redux/store';
 
 const SettingsPage = () => {
-  const {isGoogleAuth, logoutGoogle} = useGoogleContext();
-  const {isSpotifyAuth, logoutSpotify} = useSpotifyContext();
-  const savedGooglePlaylists = useSelector((state: RootState) => state.playlists.google);
-  const savedSpotifyPlaylists = useSelector((state: RootState) => state.playlists.spotify);
+  const { isGoogleAuth, logoutGoogle, playlists: googlePlaylists } = useGoogleContext();
+  const { isSpotifyAuth, logoutSpotify, playlists: spotifyPlaylists } = useSpotifyContext();
 
   const [loadingGoogle, setLoadingGoogle] = useState(false);
   const [loadingSpotify, setLoadingSpotify] = useState(false);
@@ -56,27 +52,30 @@ const SettingsPage = () => {
     }
   };
 
+  const googleAccountName = googlePlaylists[0]?.accountName || "YouTube Music";
+  const spotifyAccountName = spotifyPlaylists[0]?.accountName || "Spotify";
+
   return (
     <div className="min-h-screen p-8 bg-base-300">
       <h2 className="text-2xl font-semibold mb-4 text-base-content">Connections</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* YouTube Music Connection */}
+        {/* Google Account Connection */}
         <div className="flex items-center p-4 bg-base-100 rounded-lg shadow">
           <FaYoutube className="w-8 h-8 text-red-600 mr-4" />
           <div className="flex-1">
-            <h3 className="text-lg font-semibold text-base-content">YT Music</h3>
+            <h3 className="text-lg font-semibold text-base-content">{googleAccountName}</h3>
             <p className="text-sm text-gray-500">
               {isGoogleAuth
                 ? "Connected"
-                : savedGooglePlaylists
+                : googlePlaylists.length > 0
                   ? "Not Connected (Playlists available)"
                   : "Not Connected"}
             </p>
           </div>
           <button
             onClick={isGoogleAuth ? logoutGoogle : handleGoogleLogin}
-            className={`btn btn-sm ${isGoogleAuth ? "btn-error" : savedGooglePlaylists ? "btn-warning" : "btn-success"
+            className={`btn btn-sm ${isGoogleAuth ? "btn-error" : googlePlaylists.length > 0 ? "btn-warning" : "btn-success"
               }`}
             disabled={loadingGoogle}
           >
@@ -88,22 +87,22 @@ const SettingsPage = () => {
           </button>
         </div>
 
-        {/* Spotify Connection */}
+        {/* Spotify Account Connection */}
         <div className="flex items-center p-4 bg-base-100 rounded-lg shadow">
           <FaSpotify className="w-8 h-8 text-green-600 mr-4" />
           <div className="flex-1">
-            <h3 className="text-lg font-semibold text-base-content">Spotify</h3>
+            <h3 className="text-lg font-semibold text-base-content">{spotifyAccountName}</h3>
             <p className="text-sm text-gray-500">
               {isSpotifyAuth
                 ? "Connected"
-                : savedSpotifyPlaylists
+                : spotifyPlaylists.length > 0
                   ? "Not Connected (Playlists available)"
                   : "Not Connected"}
             </p>
           </div>
           <button
             onClick={isSpotifyAuth ? logoutSpotify : handleSpotifyLogin}
-            className={`btn btn-sm ${isSpotifyAuth ? "btn-error" : savedSpotifyPlaylists ? "btn-warning" : "btn-success"
+            className={`btn btn-sm ${isSpotifyAuth ? "btn-error" : spotifyPlaylists.length > 0 ? "btn-warning" : "btn-success"
               }`}
             disabled={loadingSpotify}
           >

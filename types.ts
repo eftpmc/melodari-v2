@@ -28,6 +28,7 @@ export interface Song {
 export interface Playlist {
     id: string;
     title: string;
+    accountName: string;
     source: string;
     description?: string; // Optional description field
     thumbnails: {

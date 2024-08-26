@@ -132,6 +132,7 @@ export const SpotifyProvider = ({ children }: SpotifyProviderProps) => {
                     const transformedPlaylists = data.items.map((playlist) => ({
                         id: playlist.id,
                         title: playlist.name,
+                        accountName: playlist.owner.display_name,
                         source: "spotify",
                         description: playlist.description,
                         thumbnails: {
