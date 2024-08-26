@@ -18,7 +18,6 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
     const loadSongs = async () => {
       if (playlist.source === 'google') {
         const fetchedSongs = await fetchGoogleSongs(playlist.id);
-        console.log(fetchedSongs)
         setSongs(fetchedSongs);
       } else if (playlist.source === 'spotify') {
         const fetchedSongs = await fetchSpotifySongs(playlist.id);
@@ -48,6 +47,7 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
             />
             <div className="ml-4 flex-1">
               <h3 className="text-xl font-bold text-base-content">{playlist.title}</h3>
+              <p className="text-sm text-gray-500">{playlist.accountName}</p> {/* Display the account name */}
               <p className="text-sm text-gray-500">{playlist.description}</p>
             </div>
           </div>
