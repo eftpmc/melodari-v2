@@ -149,7 +149,7 @@ const SettingsPage = () => {
                     className="input input-bordered w-full mb-4 text-base-content"
                 />
 
-                <button onClick={handleProfileUpdate} className="btn btn-primary">Update Profile</button>
+                <button onClick={handleProfileUpdate} className="btn btn-primary text-base-100">Update Profile</button>
             </div>
 
             <h2 className="text-2xl font-semibold mb-4 text-base-content">Connections</h2>
@@ -176,7 +176,7 @@ const SettingsPage = () => {
                                     ? () => handleDisconnectClick("google")
                                     : handleGoogleLogin
                         }
-                        className={`btn btn-sm ${googleStatus === "Re-authentication required" ? "btn-warning" : isGoogleAuth ? "btn-error" : "btn-success"}`}
+                        className={`btn btn-sm text-base-100 ${googleStatus === "Re-authentication required" ? "btn-warning" : isGoogleAuth ? "btn-error" : "btn-success"}`}
                         disabled={loadingGoogle}
                     >
                         {loadingGoogle
