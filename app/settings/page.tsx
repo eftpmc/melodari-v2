@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSpotifyContext } from '@/contexts/SpotifyContext';
 import { useGoogleContext } from '@/contexts/GoogleContext';
-import { FaSpotify } from 'react-icons/fa';
+import { FaSpotify, FaGoogle } from 'react-icons/fa';
 import { SiYoutubemusic } from "react-icons/si";
 
 const SettingsPage = () => {
@@ -75,7 +75,7 @@ const SettingsPage = () => {
     }
   }, [isGoogleAuth, isSpotifyAuth]);
 
-  const googleAccountName = googlePlaylists[0]?.accountName || "YouTube Music";
+  const googleAccountName = googlePlaylists[0]?.accountName || "Google";
   const spotifyAccountName = spotifyPlaylists[0]?.accountName || "Spotify";
 
   return (
@@ -85,7 +85,7 @@ const SettingsPage = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Google Account Connection */}
         <div className="flex items-center p-4 bg-base-100 rounded-lg shadow">
-          <SiYoutubemusic className="w-8 h-8 text-red-600 mr-4" />
+          <FaGoogle className="w-8 h-8 text-red-600 mr-4" />
           <div className="flex-1">
             <h3 className="text-lg font-semibold text-base-content">{googleAccountName}</h3>
             <p className="text-sm text-gray-500">
