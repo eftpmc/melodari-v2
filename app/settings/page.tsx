@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSpotifyContext } from '@/contexts/SpotifyContext';
 import { useGoogleContext } from '@/contexts/GoogleContext';
 import { FaSpotify } from 'react-icons/fa';
@@ -65,7 +65,7 @@ const SettingsPage = () => {
     setSpotifyStatus(authenticated ? "Authenticated" : "Re-authentication required");
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isGoogleAuth) {
       checkGoogleAuthStatus();
     }
@@ -97,16 +97,28 @@ const SettingsPage = () => {
             </p>
           </div>
           <button
-            onClick={isGoogleAuth ? logoutGoogle : handleGoogleLogin}
-            className={`btn btn-sm text-base-200 ${isGoogleAuth ? "btn-error" : googlePlaylists.length > 0 ? "btn-base-content" : "btn-success"
+            onClick={
+              googleStatus === "Re-authentication required"
+                ? handleGoogleLogin
+                : isGoogleAuth
+                ? logoutGoogle
+                : handleGoogleLogin
+            }
+            className={`btn btn-sm text-base-200 ${googleStatus === "Re-authentication required"
+                ? "btn-warning"
+                : isGoogleAuth
+                ? "btn-error"
+                : "btn-success"
               }`}
             disabled={loadingGoogle}
           >
             {loadingGoogle
               ? "Connecting..."
-              : isGoogleAuth
-                ? "Disconnect"
-                : "Connect"}
+              : googleStatus === "Re-authentication required"
+                ? "Refresh"
+                : isGoogleAuth
+                  ? "Disconnect"
+                  : "Connect"}
           </button>
         </div>
 
@@ -124,16 +136,28 @@ const SettingsPage = () => {
             </p>
           </div>
           <button
-            onClick={isSpotifyAuth ? logoutSpotify : handleSpotifyLogin}
-            className={`btn btn-sm text-base-200 ${isSpotifyAuth ? "btn-error" : spotifyPlaylists.length > 0 ? "btn-warning" : "btn-success"
+            onClick={
+              spotifyStatus === "Re-authentication required"
+                ? handleSpotifyLogin
+                : isSpotifyAuth
+                ? logoutSpotify
+                : handleSpotifyLogin
+            }
+            className={`btn btn-sm text-base-200 ${spotifyStatus === "Re-authentication required"
+                ? "btn-warning"
+                : isSpotifyAuth
+                ? "btn-error"
+                : "btn-success"
               }`}
             disabled={loadingSpotify}
           >
             {loadingSpotify
               ? "Connecting..."
-              : isSpotifyAuth
-                ? "Disconnect"
-                : "Connect"}
+              : spotifyStatus === "Re-authentication required"
+                ? "Refresh"
+                : isSpotifyAuth
+                  ? "Disconnect"
+                  : "Connect"}
           </button>
         </div>
       </div>
