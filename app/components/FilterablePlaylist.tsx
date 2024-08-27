@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Playlist } from '@/types';
 import PlaylistCard from './PlaylistCard';
 import PlaylistModal from './PlaylistModal';
@@ -10,7 +10,7 @@ interface FilterablePlaylistProps {
   spotifyPlaylists: Playlist[];
 }
 
-export default function FilterablePlaylist({ googlePlaylists, spotifyPlaylists }: FilterablePlaylistProps) {
+export default function FilterablePlaylist({ googlePlaylists = [], spotifyPlaylists = [] }: FilterablePlaylistProps) {
   const [filter, setFilter] = useState<'All' | 'YouTube Music' | 'Spotify'>('All');
   const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
   const [loading, setLoading] = useState(true);
@@ -18,12 +18,15 @@ export default function FilterablePlaylist({ googlePlaylists, spotifyPlaylists }
   useEffect(() => {
     const timeout = setTimeout(() => {
       setLoading(false);
-    }, 125); 
+    }, 125);
 
     return () => clearTimeout(timeout);
   }, []);
 
-  const getFilteredPlaylists = () => {
+  // Memoize the filtered playlists to avoid unnecessary recalculations
+  const filteredPlaylists = useMemo(() => {
+    if (!googlePlaylists || !spotifyPlaylists) return [];
+
     switch (filter) {
       case 'YouTube Music':
         return googlePlaylists;
@@ -31,11 +34,9 @@ export default function FilterablePlaylist({ googlePlaylists, spotifyPlaylists }
         return spotifyPlaylists;
       case 'All':
       default:
-        return [...googlePlaylists, ...spotifyPlaylists];
+        return [...googlePlaylists, ...spotifyPlaylists].filter((playlist) => playlist && playlist.id);
     }
-  };
-
-  const filteredPlaylists = getFilteredPlaylists();
+  }, [filter, googlePlaylists, spotifyPlaylists]);
 
   const openModal = (playlist: Playlist) => {
     setSelectedPlaylist(playlist);
