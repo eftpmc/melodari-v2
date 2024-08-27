@@ -16,21 +16,22 @@ export default function FilterablePlaylist({ googlePlaylists, spotifyPlaylists }
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading time
     const timeout = setTimeout(() => {
       setLoading(false);
-    }, 125); // Adjust the timing as needed
+    }, 125); 
 
     return () => clearTimeout(timeout);
   }, []);
 
   const getFilteredPlaylists = () => {
-    if (filter === 'YouTube Music') {
-      return googlePlaylists;
-    } else if (filter === 'Spotify') {
-      return spotifyPlaylists;
-    } else {
-      return [...googlePlaylists, ...spotifyPlaylists];
+    switch (filter) {
+      case 'YouTube Music':
+        return googlePlaylists;
+      case 'Spotify':
+        return spotifyPlaylists;
+      case 'All':
+      default:
+        return [...googlePlaylists, ...spotifyPlaylists];
     }
   };
 
@@ -66,9 +67,9 @@ export default function FilterablePlaylist({ googlePlaylists, spotifyPlaylists }
           Spotify
         </span>
       </div>
+
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
         {loading ? (
-          // Display skeletons while loading
           Array(6)
             .fill(0)
             .map((_, index) => (
@@ -85,7 +86,7 @@ export default function FilterablePlaylist({ googlePlaylists, spotifyPlaylists }
             <PlaylistCard 
               key={playlist.id} 
               playlist={playlist} 
-              onClick={() => openModal(playlist)}  // Provide the onClick prop
+              onClick={() => openModal(playlist)}
             />
           ))
         ) : (
