@@ -3,17 +3,22 @@
 import React, { useState, useEffect } from 'react';
 import { useSpotifyContext } from '@/contexts/SpotifyContext';
 import { useGoogleContext } from '@/contexts/GoogleContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { FaSpotify, FaGoogle } from 'react-icons/fa';
 import { SiYoutubemusic } from "react-icons/si";
 
 const SettingsPage = () => {
   const { isGoogleAuth, logoutGoogle, playlists: googlePlaylists, checkIfGoogleAuthenticated } = useGoogleContext();
   const { isSpotifyAuth, logoutSpotify, playlists: spotifyPlaylists, checkIfSpotifyAuthenticated } = useSpotifyContext();
+  const { username, avatarUrl, updateProfile } = useAuth();
 
   const [loadingGoogle, setLoadingGoogle] = useState(false);
   const [loadingSpotify, setLoadingSpotify] = useState(false);
   const [googleStatus, setGoogleStatus] = useState('');
   const [spotifyStatus, setSpotifyStatus] = useState('');
+
+  const [newUsername, setNewUsername] = useState(username || '');
+  const [newAvatarUrl, setNewAvatarUrl] = useState(avatarUrl || '');
 
   const handleGoogleLogin = async () => {
     setLoadingGoogle(true);
@@ -78,8 +83,41 @@ const SettingsPage = () => {
   const googleAccountName = googlePlaylists[0]?.accountName || "Google";
   const spotifyAccountName = spotifyPlaylists[0]?.accountName || "Spotify";
 
+  const handleProfileUpdate = async () => {
+    await updateProfile(newUsername, newAvatarUrl);
+    alert('Profile updated successfully');
+  };
+
   return (
     <div className="min-h-screen p-8 bg-base-300">
+      <h2 className="text-2xl font-semibold mb-4 text-base-content">Profile Settings</h2>
+
+      <div className="mb-8">
+        <label className="block text-base-content text-sm font-bold mb-2" htmlFor="username">
+          Username
+        </label>
+        <input
+          id="username"
+          type="text"
+          value={newUsername}
+          onChange={(e) => setNewUsername(e.target.value)}
+          className="input input-bordered w-full mb-4 text-base-content"
+        />
+        
+        <label className="block text-base-content text-sm font-bold mb-2" htmlFor="avatarUrl">
+          Avatar URL
+        </label>
+        <input
+          id="avatarUrl"
+          type="text"
+          value={newAvatarUrl}
+          onChange={(e) => setNewAvatarUrl(e.target.value)}
+          className="input input-bordered w-full mb-4 text-base-content"
+        />
+
+        <button onClick={handleProfileUpdate} className="btn btn-primary">Update Profile</button>
+      </div>
+
       <h2 className="text-2xl font-semibold mb-4 text-base-content">Connections</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

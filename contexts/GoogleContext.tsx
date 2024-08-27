@@ -17,12 +17,14 @@ interface SongsResponse {
 
 interface GoogleContextType {
     isGoogleAuth: boolean;
+    googleUserId: string | null;
     googleTokens: Tokens | null;
     playlists: Playlist[];
     fetchSongsForPlaylist: (playlistId: string) => Promise<Song[]>;
     logoutGoogle: () => void;
     checkIfGoogleAuthenticated: () => Promise<boolean>;
     refreshGoogleTokens: () => Promise<boolean>;
+    fetchGoogleUserId: () => Promise<string | null>;
 }
 
 interface GoogleProviderProps {
@@ -39,6 +41,7 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
 
     const [isGoogleAuth, setIsGoogleAuth] = useState<boolean>(isGoogleAuthenticated);
     const [playlists, setPlaylists] = useState<Playlist[]>([]);
+    const [googleUserId, setGoogleUserId] = useState<string | null>(null);
 
     useEffect(() => {
         setIsGoogleAuth(isGoogleAuthenticated);
@@ -49,6 +52,37 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
             loadPlaylists();
         }
     }, [isGoogleAuth]);
+
+    useEffect(() => {
+        if (isGoogleAuth && googleTokens) {
+            fetchGoogleUserId();
+        }
+    }, [isGoogleAuth, googleTokens]);
+
+    const fetchGoogleUserId = async (): Promise<string | null> => {
+        if (googleTokens?.access_token) {
+            try {
+                const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+                    method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${googleTokens.access_token}`,
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch Google user ID');
+                }
+
+                const userInfo = await response.json();
+                setGoogleUserId(userInfo.id); // Assuming the user ID is available under `id`
+                return userInfo.id;
+            } catch (error) {
+                console.error('Error fetching Google user ID:', error);
+                return null;
+            }
+        }
+        return null;
+    };
 
     const handleLogoutGoogle = async () => {
         dispatch(clearGoogleTokens());
@@ -270,12 +304,14 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
         <GoogleContext.Provider
             value={{
                 isGoogleAuth,
+                googleUserId,
                 googleTokens,
                 playlists,
                 fetchSongsForPlaylist,
                 logoutGoogle: handleLogoutGoogle,
                 checkIfGoogleAuthenticated,
                 refreshGoogleTokens,
+                fetchGoogleUserId,
             }}
         >
             {children}
