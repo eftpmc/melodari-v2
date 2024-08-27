@@ -102,24 +102,28 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
             try {
                 const res = await fetch('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=' + googleTokens.access_token);
                 const data = await res.json();
-
+    
                 if (data.error) {
-                    const refreshed = await refreshGoogleTokens();
-                    if (refreshed) {
-                        return true;
+                    // Only refresh if the error is specifically related to an expired token
+                    if (data.error === "invalid_token" || data.error === "token_expired") {
+                        const refreshed = await refreshGoogleTokens();
+                        return refreshed;
                     } else {
-                        throw new Error('Google token refresh failed');
+                        console.error('Google token error:', data.error);
+                        return false;
                     }
                 }
-
-                return data.expires_in > 0; // Check if the token is still valid
+    
+                // Ensure the token is still valid and not near expiration
+                return data.expires_in > 0;
             } catch (error) {
-                console.error('Error checking Google authentication:', error);
+                console.error('Error checking Google authentication:', (error as Error).message);
                 return false;
             }
         }
         return false;
     };
+    
 
     const fetchGooglePlaylists = async (): Promise<Playlist[] | null> => {
         if (googleTokens?.access_token) {

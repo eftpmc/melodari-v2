@@ -92,24 +92,26 @@ export const SpotifyProvider = ({ children }: SpotifyProviderProps) => {
                         'Authorization': `Bearer ${spotifyTokens.access_token}`,
                     },
                 });
-
+    
                 if (!res.ok) {
-                    const refreshed = await refreshSpotifyTokens();
-                    if (refreshed) {
-                        return true;
+                    // Check if the response status is 401 (Unauthorized), which indicates that the token might have expired or is invalid
+                    if (res.status === 401) {
+                        const refreshed = await refreshSpotifyTokens();
+                        return refreshed;
                     } else {
-                        throw new Error('Spotify token refresh failed');
+                        console.error('Spotify token error:', res.statusText);
+                        return false;
                     }
                 }
-
+    
                 return res.ok; // If response is OK, the token is still valid
             } catch (error) {
-                console.error('Error checking Spotify authentication:', error);
+                console.error('Error checking Spotify authentication:', (error as Error).message);
                 return false;
             }
         }
         return false;
-    };
+    };    
 
     const loadPlaylists = async () => {
         if (Object.keys(storedSpotifyPlaylists).length > 0) {
