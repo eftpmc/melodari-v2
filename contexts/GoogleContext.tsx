@@ -169,42 +169,48 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
 
     const validatePlaylists = (playlists: Playlist[]): Playlist[] => {
         const uniquePlaylists: { [id: string]: Playlist } = {};
-
+    
         playlists.forEach((playlist) => {
             if (!uniquePlaylists[playlist.id]) {
                 uniquePlaylists[playlist.id] = playlist;
             } else {
                 console.warn(`Duplicate playlist found: ${playlist.title}`);
             }
-
+    
             // Ensure all necessary information is present
             if (!playlist.title || !playlist.id || !playlist.source) {
                 console.error(`Playlist is missing essential information: ${playlist.id}`);
             }
         });
-
+    
         return Object.values(uniquePlaylists);
-    };
+    };    
 
     const loadPlaylists = async () => {
         let validatedPlaylists: Playlist[] = [];
-
-        // Validate stored playlists
+    
+        // Validate and add stored playlists
         if (Object.keys(storedGooglePlaylists).length > 0) {
             validatedPlaylists = validatePlaylists(Object.values(storedGooglePlaylists));
-            setPlaylists(validatedPlaylists);
         }
-
-        // Fetch new playlists if necessary and validate them
+    
+        // Fetch and validate new playlists
         const fetchedPlaylists = await fetchGooglePlaylists();
-
         if (fetchedPlaylists) {
             const newValidatedPlaylists = validatePlaylists(fetchedPlaylists);
-            validatedPlaylists = [...validatedPlaylists, ...newValidatedPlaylists];
-            dispatch(UpdateGooglePlaylists(validatedPlaylists));
+    
+            // Merge playlists ensuring no duplicates
+            const mergedPlaylists = validatePlaylists([...validatedPlaylists, ...newValidatedPlaylists]);
+    
+            // Update state and store with the final list of unique playlists
+            dispatch(UpdateGooglePlaylists(mergedPlaylists));
+            setPlaylists(mergedPlaylists);
+        } else {
+            // If no new playlists are fetched, use the stored ones
             setPlaylists(validatedPlaylists);
         }
     };
+    
 
     const fetchSongsForPlaylist = async (playlistId: string): Promise<Song[]> => {
         const playlist = playlists.find(p => p.id === playlistId);
