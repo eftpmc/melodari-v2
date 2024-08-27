@@ -117,9 +117,9 @@ const SettingsPage = () => {
             {/* Google Connection Alert */}
             {!isGoogleAuth && (
                 <div className="alert alert-error shadow-lg mb-8">
-                    <div className="flex items-center">
-                        <CircleAlert className='mr-2'/>
-                        <span className="flex-grow">Connect to Google to maintain your account.</span>
+                    <div className="flex items-center space-x-2">
+                        <CircleAlert className="w-5 h-5 flex-shrink-0" />
+                        <span className="text-sm truncate">Connect to Google to maintain your account.</span>
                     </div>
                 </div>
             )}
@@ -210,7 +210,7 @@ const SettingsPage = () => {
                                     ? () => handleDisconnectClick("spotify")
                                     : handleSpotifyLogin
                         }
-                        className={`btn btn-sm ${spotifyStatus === "Re-authentication required" ? "btn-warning" : isSpotifyAuth ? "btn-error" : "btn-success"}`}
+                        className={`btn btn-sm text-base-100 ${spotifyStatus === "Re-authentication required" ? "btn-warning" : isSpotifyAuth ? "btn-error" : "btn-success"}`}
                         disabled={loadingSpotify}
                     >
                         {loadingSpotify

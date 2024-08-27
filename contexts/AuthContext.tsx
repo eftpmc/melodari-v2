@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useGoogleContext } from './GoogleContext';
 import { useSpotifyContext } from './SpotifyContext';
 import { createClient } from '@/utils/supabase/client';
+import { logout } from '@/utils/redux/authSlice';
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -21,7 +22,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-    const { isGoogleAuth, fetchGoogleUserId } = useGoogleContext();
+    const { isGoogleAuth, fetchGoogleUserId, logoutGoogle } = useGoogleContext();
     const { isSpotifyAuth, logoutSpotify } = useSpotifyContext();
     const supabase = createClient();
     const [isAuth, setIsAuth] = useState<boolean>(isGoogleAuth || isSpotifyAuth);
@@ -119,6 +120,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const handleLogout = () => {
         logoutSpotify();
+        logoutGoogle();
+        logout();
         setSupabaseUserId(null);
         setAvatarUrl(null);
         setUsername(null);
