@@ -21,6 +21,18 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({
   onDisconnect,
   loading,
 }) => {
+  const handleButtonClick = () => {
+    if (loading) return; // Prevent action if loading
+
+    if (status === "Re-authentication required") {
+      onConnect();
+    } else if (isConnected) {
+      onDisconnect();
+    } else {
+      onConnect();
+    }
+  };
+
   return (
     <div className="flex items-center p-4 bg-base-100 rounded-lg shadow">
       {icon}
@@ -33,7 +45,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({
         </p>
       </div>
       <button
-        onClick={isConnected ? onDisconnect : onConnect}
+        onClick={handleButtonClick}
         className={`btn btn-sm text-base-100 ${status === "Re-authentication required" ? "btn-warning" : isConnected ? "btn-error" : "btn-success"}`}
         disabled={loading}
       >
