@@ -18,7 +18,7 @@ const FriendList: React.FC = () => {
             ) : (
                 <div className="flex flex-col items-center justify-center h-32 bg-base-100 rounded-md shadow-md">
                     <p className="text-lg font-semibold text-base-content">No Friends Found</p>
-                    <p className="text-sm text-gray-500">You haven’t added any friends yet.</p>
+                    <p className="text-sm text-gray-500">You haven&apos;t added any friends yet.</p>
                 </div>
             )}
         </div>
