@@ -8,9 +8,10 @@ interface ConfirmDialogProps {
   message: string;
   onConfirm: () => void;
   onCancel: () => void;
+  confirmButtonText: string; // Add this prop
 }
 
-const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ show, title, message, onConfirm, onCancel }) => {
+const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ show, title, message, onConfirm, onCancel, confirmButtonText }) => {
   if (!show) return null;
 
   return (
@@ -29,7 +30,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ show, title, message, onC
             onClick={onConfirm}
             className="btn btn-error"
           >
-            Disconnect
+            {confirmButtonText} {/* Use the dynamic button text */}
           </button>
         </div>
       </div>

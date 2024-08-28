@@ -3,14 +3,25 @@
 import { Menu, LogOut, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from '@/contexts/AuthContext';
+import React, { useState } from 'react';
+import ConfirmDialog from './ConfirmDialog'; // Adjust the import path based on your project structure
 
 const MenuButton = () => {
   const router = useRouter();
   const { logout } = useAuth();
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
-  const handleSignOut = async () => {
+  const handleSignOut = () => {
+    setShowConfirmDialog(true);
+  };
+
+  const confirmSignOut = async () => {
     await logout();
     router.push('/');
+  };
+
+  const cancelSignOut = () => {
+    setShowConfirmDialog(false);
   };
 
   const handleSettings = () => {
@@ -34,6 +45,16 @@ const MenuButton = () => {
           </a>
         </li>
       </ul>
+
+      {/* Confirm Sign Out Dialog */}
+      <ConfirmDialog
+        show={showConfirmDialog}
+        title="Sign Out"
+        message="Are you sure you want to sign out?"
+        onConfirm={confirmSignOut}
+        onCancel={cancelSignOut}
+        confirmButtonText="Sign Out"
+      />
     </div>
   );
 };
