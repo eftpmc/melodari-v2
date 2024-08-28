@@ -40,31 +40,33 @@ export default function FilterablePlaylist({ googlePlaylists = [], spotifyPlayli
     fetchPlayCounts();
   }, [googlePlaylists, spotifyPlaylists, getPlayCount]);
 
-  const sortedGooglePlaylists = useMemo(() => {
-    return googlePlaylists.map(playlist => ({
-      ...playlist,
-      playCount: playCounts[playlist.id] || 0,
-    })).sort((a, b) => (b.playCount || 0) - (a.playCount || 0));
-  }, [googlePlaylists, playCounts]);
+  const sortedPlaylists = useMemo(() => {
+    const allPlaylists = [
+      ...googlePlaylists.map(playlist => ({
+        ...playlist,
+        playCount: playCounts[playlist.id] || 0,
+      })),
+      ...spotifyPlaylists.map(playlist => ({
+        ...playlist,
+        playCount: playCounts[playlist.id] || 0,
+      })),
+    ];
 
-  const sortedSpotifyPlaylists = useMemo(() => {
-    return spotifyPlaylists.map(playlist => ({
-      ...playlist,
-      playCount: playCounts[playlist.id] || 0,
-    })).sort((a, b) => (b.playCount || 0) - (a.playCount || 0));
-  }, [spotifyPlaylists, playCounts]);
+    // Sort the combined playlists by play count
+    return allPlaylists.sort((a, b) => (b.playCount || 0) - (a.playCount || 0));
+  }, [googlePlaylists, spotifyPlaylists, playCounts]);
 
   const filteredPlaylists = useMemo(() => {
     switch (filter) {
       case 'YouTube Music':
-        return sortedGooglePlaylists;
+        return sortedPlaylists.filter(playlist => playlist.source === 'google');
       case 'Spotify':
-        return sortedSpotifyPlaylists;
+        return sortedPlaylists.filter(playlist => playlist.source === 'spotify');
       case 'All':
       default:
-        return [...sortedGooglePlaylists, ...sortedSpotifyPlaylists];
+        return sortedPlaylists;
     }
-  }, [filter, sortedGooglePlaylists, sortedSpotifyPlaylists]);
+  }, [filter, sortedPlaylists]);
 
   const openModal = async (playlist: Playlist) => {
     setSelectedPlaylist(playlist);
