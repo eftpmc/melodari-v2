@@ -14,6 +14,7 @@ export interface Tokens {
 
 export interface Song {
     id: string;
+    isrc?: string;
     title: string;
     thumbnails: {
       default: string;
