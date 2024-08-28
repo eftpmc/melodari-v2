@@ -8,11 +8,16 @@ interface ConfirmDialogProps {
   message: string;
   onConfirm: () => void;
   onCancel: () => void;
-  confirmButtonText: string; // Add this prop
+  confirmButtonText: string;
 }
 
 const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ show, title, message, onConfirm, onCancel, confirmButtonText }) => {
   if (!show) return null;
+
+  const handleConfirm = () => {
+    onConfirm(); // Call the confirm action
+    onCancel();  // Close the dialog after confirming
+  };
 
   return (
     <div className="modal modal-open">
@@ -27,10 +32,10 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ show, title, message, onC
             Cancel
           </button>
           <button
-            onClick={onConfirm}
+            onClick={handleConfirm} // Handle confirm and close
             className="btn btn-error"
           >
-            {confirmButtonText} {/* Use the dynamic button text */}
+            {confirmButtonText}
           </button>
         </div>
       </div>

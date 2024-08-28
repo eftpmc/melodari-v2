@@ -4,7 +4,7 @@ import "./globals.css";
 import Link from "next/link";
 import ThemeSwitcher from "./components/ThemeSwitcher";
 import MenuButton from "./components/MenuButton";
-import ClientProvider from "./components/ClientProvider"; // Import your ClientProvider
+import ClientProvider from "./components/ClientProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
