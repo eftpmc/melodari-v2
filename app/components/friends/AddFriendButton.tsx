@@ -30,7 +30,7 @@ const AddFriendButton: React.FC = () => {
                 <div className="modal modal-open">
                     <div className="modal-box">
                         <h3 className="font-bold text-lg text-base-content">Add a Friend</h3>
-                        <p className="py-4 text-base-content">Enter your friend's username to add them.</p>
+                        <p className="py-4 text-base-content">Enter your friend&apos;s username to add them.</p>
                         <input
                             type="text"
                             placeholder="Friend's username"
