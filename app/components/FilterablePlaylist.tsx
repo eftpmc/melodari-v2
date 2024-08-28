@@ -69,7 +69,7 @@ export default function FilterablePlaylist({ googlePlaylists = [], spotifyPlayli
         </span>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2">
         {loading ? (
           Array(6)
             .fill(0)
