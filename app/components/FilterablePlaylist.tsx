@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { Playlist } from '@/types';
 import PlaylistCard from './PlaylistCard';
 import PlaylistModal from './PlaylistModal';
@@ -14,6 +15,9 @@ export default function FilterablePlaylist({ googlePlaylists = [], spotifyPlayli
   const [filter, setFilter] = useState<'All' | 'YouTube Music' | 'Spotify'>('All');
   const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
   const [loading, setLoading] = useState(true);
+  const [playCounts, setPlayCounts] = useState<{ [id: string]: number }>({});
+
+  const { getPlayCount, incrementPlayCount } = useAuth();
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -23,23 +27,52 @@ export default function FilterablePlaylist({ googlePlaylists = [], spotifyPlayli
     return () => clearTimeout(timeout);
   }, []);
 
-  // Memoize the filtered playlists to avoid unnecessary recalculations
-  const filteredPlaylists = useMemo(() => {
-    if (!googlePlaylists || !spotifyPlaylists) return [];
+  useEffect(() => {
+    const fetchPlayCounts = async () => {
+      const counts: { [id: string]: number } = {};
+      const allPlaylists = [...googlePlaylists, ...spotifyPlaylists];
+      for (const playlist of allPlaylists) {
+        counts[playlist.id] = await getPlayCount(playlist.id);
+      }
+      setPlayCounts(counts);
+    };
 
+    fetchPlayCounts();
+  }, [googlePlaylists, spotifyPlaylists, getPlayCount]);
+
+  const sortedGooglePlaylists = useMemo(() => {
+    return googlePlaylists.map(playlist => ({
+      ...playlist,
+      playCount: playCounts[playlist.id] || 0,
+    })).sort((a, b) => (b.playCount || 0) - (a.playCount || 0));
+  }, [googlePlaylists, playCounts]);
+
+  const sortedSpotifyPlaylists = useMemo(() => {
+    return spotifyPlaylists.map(playlist => ({
+      ...playlist,
+      playCount: playCounts[playlist.id] || 0,
+    })).sort((a, b) => (b.playCount || 0) - (a.playCount || 0));
+  }, [spotifyPlaylists, playCounts]);
+
+  const filteredPlaylists = useMemo(() => {
     switch (filter) {
       case 'YouTube Music':
-        return googlePlaylists;
+        return sortedGooglePlaylists;
       case 'Spotify':
-        return spotifyPlaylists;
+        return sortedSpotifyPlaylists;
       case 'All':
       default:
-        return [...googlePlaylists, ...spotifyPlaylists].filter((playlist) => playlist && playlist.id);
+        return [...sortedGooglePlaylists, ...sortedSpotifyPlaylists];
     }
-  }, [filter, googlePlaylists, spotifyPlaylists]);
+  }, [filter, sortedGooglePlaylists, sortedSpotifyPlaylists]);
 
-  const openModal = (playlist: Playlist) => {
+  const openModal = async (playlist: Playlist) => {
     setSelectedPlaylist(playlist);
+    await incrementPlayCount(playlist.id); // Increment play count when playlist is opened
+    setPlayCounts(prev => ({
+      ...prev,
+      [playlist.id]: (prev[playlist.id] || 0) + 1,
+    }));
   };
 
   const closeModal = () => {
