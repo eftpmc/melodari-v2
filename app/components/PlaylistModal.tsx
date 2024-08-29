@@ -5,14 +5,24 @@ import { Playlist, Song } from '@/types';
 import { useGoogleContext } from '@/contexts/GoogleContext';
 import { useSpotifyContext } from '@/contexts/SpotifyContext';
 import SongItem from './SongItem';
+import { FaSpotify } from 'react-icons/fa';
+import { SiYoutubemusic } from 'react-icons/si';
+import { Plus } from 'lucide-react';
 
 interface PlaylistModalProps {
   playlist: Playlist;
   onClose: () => void;
 }
 
+const platformsData = [
+  { id: 'google', name: 'YouTube Music', icon: <SiYoutubemusic className="text-red-600 w-6 h-6" /> },
+  { id: 'spotify', name: 'Spotify', icon: <FaSpotify className="text-green-600 w-6 h-6" /> },
+  // Add more platforms as needed
+];
+
 const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
-  const { fetchSongsForPlaylist: fetchGoogleSongs } = useGoogleContext();
+  const { fetchSongsForPlaylist: fetchGoogleSongs, findGooglePlaylist, createGooglePlaylist, matchSongsOnGoogle, addSongsToGooglePlaylist } = useGoogleContext();
+  const { findSpotifyPlaylist, createSpotifyPlaylist, matchSongsOnSpotify, addSongsToSpotifyPlaylist } = useSpotifyContext();
   const { fetchSongsForPlaylist: fetchSpotifySongs } = useSpotifyContext();
   const [loading, setLoading] = useState(true);
   const [songs, setSongs] = useState<Song[]>([]);
@@ -20,10 +30,10 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
 
   useEffect(() => {
     const loadSongs = async () => {
-      if (playlist.source === 'google') {
+      if (playlist.platforms.includes('google')) {
         const fetchedSongs = await fetchGoogleSongs(playlist.id);
         setSongs(fetchedSongs);
-      } else if (playlist.source === 'spotify') {
+      } else if (playlist.platforms.includes('spotify')) {
         const fetchedSongs = await fetchSpotifySongs(playlist.id);
         setSongs(fetchedSongs);
       }
@@ -36,6 +46,50 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
   const handleSongClick = (index: number) => {
     setOpenSongIndex(openSongIndex === index ? null : index);
   };
+
+  const handleAddPlatform = async (platformId: string) => {
+    if (playlist.platforms.includes(platformId)) return;
+
+    setLoading(true);
+
+    try {
+      if (platformId === 'google') {
+        let googlePlaylist = await findGooglePlaylist(playlist.title);
+
+        if (!googlePlaylist) {
+          googlePlaylist = await createGooglePlaylist(playlist.title, playlist.description);
+        }
+
+        if (googlePlaylist) {
+          const matchedSongs = await matchSongsOnGoogle(songs);
+          await addSongsToGooglePlaylist(googlePlaylist.id, matchedSongs);
+          playlist.platforms.push('google'); // Add to platforms
+        }
+      }
+
+      if (platformId === 'spotify') {
+        let spotifyPlaylist = await findSpotifyPlaylist(playlist.title);
+
+        if (!spotifyPlaylist) {
+          spotifyPlaylist = await createSpotifyPlaylist(playlist.title, playlist.description);
+        }
+
+        if (spotifyPlaylist) {
+          const matchedSongs = await matchSongsOnSpotify(songs);
+          await addSongsToSpotifyPlaylist(spotifyPlaylist.id, matchedSongs);
+          playlist.platforms.push('spotify'); // Add to platforms
+        }
+      }
+    } catch (error) {
+      console.error('Error adding platform:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const availablePlatforms = platformsData.filter(
+    (platform) => !playlist.platforms.includes(platform.id)
+  );
 
   if (!playlist) return null;
 
@@ -77,6 +131,37 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
                     {playlist.accountName}
                   </p>
                   <p className="text-sm text-gray-500">{playlist.description}</p>
+                  <div className="flex items-center mt-4 space-x-4">
+                    {playlist.platforms.map((platformId) => {
+                      const platform = platformsData.find(p => p.id === platformId);
+                      return platform ? (
+                        <div key={platformId} className="flex items-center">
+                          {platform.icon}
+                        </div>
+                      ) : null;
+                    })}
+                    {availablePlatforms.length > 0 && (
+                      <div className="dropdown">
+                        <label tabIndex={0} className="btn btn-outline btn-sm flex items-center">
+                          <Plus className="w-4 h-4" />
+                          Add Platform
+                        </label>
+                        <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-200 rounded-box w-52 mt-2">
+                          {availablePlatforms.map((platform) => (
+                            <li key={platform.id}>
+                              <button
+                                className="flex items-center space-x-2 p-2 hover:bg-base-100 rounded w-full text-left"
+                                onClick={() => handleAddPlatform(platform.id)}
+                              >
+                                {platform.icon}
+                                <div className='text-base-content'>{platform.name}</div>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
                 </>
               )}
             </div>

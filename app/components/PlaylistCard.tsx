@@ -1,6 +1,6 @@
 import React from 'react';
 import { Playlist } from '@/types';
-import { FaSpotify, FaYoutube } from 'react-icons/fa';
+import { FaSpotify } from 'react-icons/fa';
 import { SiYoutubemusic } from 'react-icons/si';
 
 interface PlaylistCardProps {
@@ -9,13 +9,10 @@ interface PlaylistCardProps {
 }
 
 const PlaylistCard: React.FC<PlaylistCardProps> = ({ playlist, onClick }) => {
-  // Determine the icon based on the source of the playlist
-  const icon =
-    playlist.source === 'spotify' ? (
-      <FaSpotify className="text-green-500 w-6 h-6" />
-    ) : (
-      <SiYoutubemusic className="text-red-500 w-6 h-6" />
-    );
+  const platformIcons: { [key: string]: React.JSX.Element } = {
+    google: <SiYoutubemusic className="text-red-500 w-6 h-6" />,
+    spotify: <FaSpotify className="text-green-500 w-6 h-6" />,
+};
 
   return (
     <label
@@ -34,7 +31,11 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({ playlist, onClick }) => {
         <div className="text-base-content font-semibold">{playlist.title}</div>
         <div className="text-sm text-gray-500">{playlist.accountName}</div> {/* Additional Info */}
       </div>
-      <div className="ml-4">{icon}</div> {/* Icon added here */}
+      <div className="ml-4 flex space-x-2">
+        {playlist.platforms.map(platformId => (
+          <div key={platformId}>{platformIcons[platformId]}</div>
+        ))}
+      </div>
     </label>
   );
 };

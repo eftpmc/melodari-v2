@@ -36,6 +36,7 @@ export interface Playlist {
     high: string;
   };
   songs: Song[]; // Array of Song objects
+  platforms: string[];
 }
 
 export interface GoogleSong {

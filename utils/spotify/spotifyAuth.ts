@@ -5,7 +5,7 @@ const client_secret = process.env.SPOTIFY_CLIENT_SECRET!;
 const redirect_uri = process.env.SPOTIFY_REDIRECT_URI!;
 
 export function generateSpotifyAuthUrl(state: string) {
-    const scope = 'user-read-private user-read-email';
+    const scope = 'user-read-private playlist-read-private user-read-email playlist-modify-public playlist-modify-private';
 
     return (
         'https://accounts.spotify.com/authorize?' +

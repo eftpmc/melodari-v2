@@ -40,33 +40,43 @@ export default function FilterablePlaylist({ googlePlaylists = [], spotifyPlayli
     fetchPlayCounts();
   }, [googlePlaylists, spotifyPlaylists, getPlayCount]);
 
-  const sortedPlaylists = useMemo(() => {
-    const allPlaylists = [
-      ...googlePlaylists.map(playlist => ({
-        ...playlist,
-        playCount: playCounts[playlist.id] || 0,
-      })),
-      ...spotifyPlaylists.map(playlist => ({
-        ...playlist,
-        playCount: playCounts[playlist.id] || 0,
-      })),
-    ];
+  const combinedPlaylists = useMemo(() => {
+    const playlistMap: { [title: string]: Playlist } = {};
 
-    // Sort the combined playlists by play count
-    return allPlaylists.sort((a, b) => (b.playCount || 0) - (a.playCount || 0));
+    googlePlaylists.forEach((playlist) => {
+      if (!playlistMap[playlist.title]) {
+        playlistMap[playlist.title] = {
+          ...playlist,
+          platforms: ['google'],
+        };
+      }
+    });
+
+    spotifyPlaylists.forEach((playlist) => {
+      if (playlistMap[playlist.title]) {
+        playlistMap[playlist.title].platforms.push('spotify');
+      } else {
+        playlistMap[playlist.title] = {
+          ...playlist,
+          platforms: ['spotify'],
+        };
+      }
+    });
+
+    return Object.values(playlistMap).sort((a, b) => (playCounts[b.id] || 0) - (playCounts[a.id] || 0));
   }, [googlePlaylists, spotifyPlaylists, playCounts]);
 
   const filteredPlaylists = useMemo(() => {
     switch (filter) {
       case 'YouTube Music':
-        return sortedPlaylists.filter(playlist => playlist.source === 'google');
+        return combinedPlaylists.filter(playlist => playlist.platforms.includes('google'));
       case 'Spotify':
-        return sortedPlaylists.filter(playlist => playlist.source === 'spotify');
+        return combinedPlaylists.filter(playlist => playlist.platforms.includes('spotify'));
       case 'All':
       default:
-        return sortedPlaylists;
+        return combinedPlaylists;
     }
-  }, [filter, sortedPlaylists]);
+  }, [filter, combinedPlaylists]);
 
   const openModal = async (playlist: Playlist) => {
     setSelectedPlaylist(playlist);

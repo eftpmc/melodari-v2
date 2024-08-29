@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/utils/redux/store';
 import { clearGoogleTokens, setGoogleTokens } from '@/utils/redux/authSlice';
 import { clearGooglePlaylists, UpdateGooglePlaylists, UpdatePlaylistSongs } from '@/utils/redux/playlistSlice';
-import { Playlist, Song, Tokens } from '@/types';
+import { GooglePlaylist, GoogleSong, Playlist, Song, Tokens } from '@/types';
 
 interface PlaylistsResponse {
     items: any[];
@@ -21,10 +21,15 @@ interface GoogleContextType {
     googleTokens: Tokens | null;
     playlists: Playlist[];
     fetchSongsForPlaylist: (playlistId: string) => Promise<Song[]>;
+    convertPlaylistToGoogle: (playlist: Playlist) => Promise<boolean>;
     logoutGoogle: () => void;
     checkIfGoogleAuthenticated: () => Promise<boolean>;
     refreshGoogleTokens: () => Promise<boolean>;
     fetchGoogleUserId: () => Promise<string | null>;
+    findGooglePlaylist: (title: string) => Promise<GooglePlaylist | null>;
+    createGooglePlaylist: (title: string, description?: string) => Promise<GooglePlaylist | null>;
+    matchSongsOnGoogle: (songs: Song[]) => Promise<GoogleSong[]>;
+    addSongsToGooglePlaylist: (playlistId: string, songs: GoogleSong[]) => Promise<void>;
 }
 
 interface GoogleProviderProps {
@@ -136,7 +141,7 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
             try {
                 const res = await fetch('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=' + googleTokens.access_token);
                 const data = await res.json();
-    
+
                 if (data.error) {
                     // Only refresh if the error is specifically related to an expired token
                     if (data.error === "invalid_token" || data.error === "token_expired") {
@@ -147,7 +152,7 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
                         return false;
                     }
                 }
-    
+
                 // Ensure the token is still valid and not near expiration
                 return data.expires_in > 0;
             } catch (error) {
@@ -157,7 +162,7 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
         }
         return false;
     };
-    
+
 
     const fetchGooglePlaylists = async (): Promise<Playlist[] | null> => {
         if (googleTokens?.access_token) {
@@ -184,6 +189,7 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
                             high: playlist.snippet.thumbnails.high.url,
                         },
                         songs: [], // songs will be loaded separately
+                        platforms: ['google'], // Add Google to the platforms array
                     }));
                     return transformedPlaylists;
                 } else if (res.status === 401) { // Unauthorized
@@ -203,39 +209,39 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
 
     const validatePlaylists = (playlists: Playlist[]): Playlist[] => {
         const uniquePlaylists: { [id: string]: Playlist } = {};
-    
+
         playlists.forEach((playlist) => {
             if (!uniquePlaylists[playlist.id]) {
                 uniquePlaylists[playlist.id] = playlist;
             } else {
                 console.warn(`Duplicate playlist found: ${playlist.title}`);
             }
-    
+
             // Ensure all necessary information is present
             if (!playlist.title || !playlist.id || !playlist.source) {
                 console.error(`Playlist is missing essential information: ${playlist.id}`);
             }
         });
-    
+
         return Object.values(uniquePlaylists);
-    };    
+    };
 
     const loadPlaylists = async () => {
         let validatedPlaylists: Playlist[] = [];
-    
+
         // Validate and add stored playlists
         if (Object.keys(storedGooglePlaylists).length > 0) {
             validatedPlaylists = validatePlaylists(Object.values(storedGooglePlaylists));
         }
-    
+
         // Fetch and validate new playlists
         const fetchedPlaylists = await fetchGooglePlaylists();
         if (fetchedPlaylists) {
             const newValidatedPlaylists = validatePlaylists(fetchedPlaylists);
-    
+
             // Merge playlists ensuring no duplicates
             const mergedPlaylists = validatePlaylists([...validatedPlaylists, ...newValidatedPlaylists]);
-    
+
             // Update state and store with the final list of unique playlists
             dispatch(UpdateGooglePlaylists(mergedPlaylists));
             setPlaylists(mergedPlaylists);
@@ -244,7 +250,7 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
             setPlaylists(validatedPlaylists);
         }
     };
-    
+
 
     const fetchSongsForPlaylist = async (playlistId: string): Promise<Song[]> => {
         const playlist = playlists.find(p => p.id === playlistId);
@@ -279,7 +285,7 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
                     }));
                     dispatch(UpdatePlaylistSongs({ playlistId, songs: fetchedSongs }));
 
-                    setPlaylists(prevPlaylists => prevPlaylists.map(p => 
+                    setPlaylists(prevPlaylists => prevPlaylists.map(p =>
                         p.id === playlistId ? { ...p, songs: fetchedSongs } : p
                     ));
 
@@ -300,6 +306,189 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
         return [];
     };
 
+    const convertPlaylistToGoogle = async (playlist: Playlist): Promise<boolean> => {
+        if (!googleTokens) return false;
+
+        try {
+            // Check if the playlist already exists on YouTube Music by title
+            let existingPlaylist = await findGooglePlaylist(playlist.title);
+
+            if (!existingPlaylist) {
+                // Create a new playlist on YouTube Music
+                existingPlaylist = await createGooglePlaylist(playlist.title, playlist.description);
+            }
+
+            if (!existingPlaylist) return false;
+
+            // Match songs between platforms and add them to the YouTube Music playlist
+            const matchedSongs = await matchSongsOnGoogle(playlist.songs);
+            await addSongsToGooglePlaylist(existingPlaylist.id, matchedSongs);
+
+            return true;
+        } catch (error) {
+            console.error('Error converting playlist to Google:', error);
+            return false;
+        }
+    };
+
+    const findGooglePlaylist = async (title: string): Promise<GooglePlaylist | null> => {
+        if (!googleTokens?.access_token) return null;
+
+        try {
+            const res = await fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet&mine=true&maxResults=50`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${googleTokens.access_token}`,
+                    Accept: 'application/json',
+                },
+            });
+
+            if (res.ok) {
+                const data: PlaylistsResponse = await res.json();
+                const playlist = data.items.find((pl) => pl.snippet.title.toLowerCase() === title.toLowerCase());
+
+                if (playlist) {
+                    return {
+                        id: playlist.id,
+                        title: playlist.snippet.title,
+                        description: playlist.snippet.description,
+                        thumbnails: {
+                            default: playlist.snippet.thumbnails.default.url,
+                            medium: playlist.snippet.thumbnails.medium.url,
+                            high: playlist.snippet.thumbnails.high.url,
+                        },
+                        songs: [], // Songs will be fetched separately
+                    } as GooglePlaylist;
+                }
+            } else {
+                console.error('Failed to find Google playlist:', res.statusText);
+            }
+        } catch (error) {
+            console.error('Error finding Google playlist:', error);
+        }
+
+        return null;
+    };
+
+    const createGooglePlaylist = async (title: string, description?: string): Promise<GooglePlaylist | null> => {
+        if (!googleTokens?.access_token) return null;
+
+        try {
+            const res = await fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${googleTokens.access_token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    snippet: {
+                        title: title,
+                        description: description || '',
+                    },
+                }),
+            });
+
+            if (res.ok) {
+                const playlist = await res.json();
+                return {
+                    id: playlist.id,
+                    title: playlist.snippet.title,
+                    description: playlist.snippet.description,
+                    thumbnails: {
+                        default: playlist.snippet.thumbnails.default.url,
+                        medium: playlist.snippet.thumbnails.medium.url,
+                        high: playlist.snippet.thumbnails.high.url,
+                    },
+                    songs: [],
+                } as GooglePlaylist;
+            } else {
+                console.error('Failed to create Google playlist:', res.statusText);
+            }
+        } catch (error) {
+            console.error('Error creating Google playlist:', error);
+        }
+
+        return null;
+    };
+
+    const matchSongsOnGoogle = async (songs: Song[]): Promise<GoogleSong[]> => {
+        const matchedSongs: GoogleSong[] = [];
+
+        for (const song of songs) {
+            const matchedSong = await searchSongOnGoogle(song.title, song.artist);
+            if (matchedSong) {
+                matchedSongs.push(matchedSong);
+            }
+        }
+
+        return matchedSongs;
+    };
+
+    const addSongsToGooglePlaylist = async (playlistId: string, songs: GoogleSong[]) => {
+        if (!googleTokens?.access_token) return;
+
+        try {
+            for (const song of songs) {
+                await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet`, {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${googleTokens.access_token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        snippet: {
+                            playlistId: playlistId,
+                            resourceId: {
+                                kind: 'youtube#video',
+                                videoId: song.id,
+                            },
+                        },
+                    }),
+                });
+            }
+        } catch (error) {
+            console.error('Error adding songs to Google playlist:', error);
+        }
+    };
+
+    const searchSongOnGoogle = async (title: string, artist?: string): Promise<GoogleSong | null> => {
+        if (!googleTokens?.access_token) return null;
+
+        try {
+            const query = artist ? `${title} ${artist}` : title;
+            const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&maxResults=1&type=video`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${googleTokens.access_token}`,
+                    Accept: 'application/json',
+                },
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                if (data.items.length > 0) {
+                    const video = data.items[0];
+                    return {
+                        id: video.id.videoId,
+                        title: video.snippet.title,
+                        videoId: video.id.videoId,
+                        thumbnails: {
+                            default: video.snippet.thumbnails.default.url,
+                            medium: video.snippet.thumbnails.medium.url,
+                            high: video.snippet.thumbnails.high.url,
+                        },
+                    } as GoogleSong;
+                }
+            } else {
+                console.error('Failed to search for song on Google:', res.statusText);
+            }
+        } catch (error) {
+            console.error('Error searching for song on Google:', error);
+        }
+
+        return null;
+    };
+
     return (
         <GoogleContext.Provider
             value={{
@@ -308,10 +497,15 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
                 googleTokens,
                 playlists,
                 fetchSongsForPlaylist,
+                convertPlaylistToGoogle,
                 logoutGoogle: handleLogoutGoogle,
                 checkIfGoogleAuthenticated,
                 refreshGoogleTokens,
                 fetchGoogleUserId,
+                findGooglePlaylist,
+                createGooglePlaylist,
+                matchSongsOnGoogle,
+                addSongsToGooglePlaylist,
             }}
         >
             {children}
