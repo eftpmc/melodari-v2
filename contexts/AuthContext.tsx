@@ -18,6 +18,10 @@ interface AuthContextType {
     updateProfile: (newUsername: string, newAvatarUrl: string, newPlatforms: string[]) => Promise<void>;
     getPlayCount: (playlistId: string) => Promise<number>;
     incrementPlayCount: (playlistId: string) => Promise<void>;
+    friendsList: any[];
+    friendRequests: any[];
+    sendFriendRequest: (username: string) => Promise<boolean>;
+    handleAcceptFriendRequest: (requestId: string, senderId: string) => Promise<void>;
 }
 
 interface AuthProviderProps {
@@ -34,6 +38,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [username, setUsername] = useState<string | null>(null);
     const [platforms, setPlatforms] = useState<string[] | null>(null);
     const [playCount, setPlayCount] = useState<{ [key: string]: number }>({});
+    const [friendsList, setFriendsList] = useState<any[]>([]);
+    const [friendRequests, setFriendRequests] = useState<any[]>([]);
 
     useEffect(() => {
         setIsAuth(isGoogleAuth || isSpotifyAuth);
@@ -48,7 +54,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const fetchAndHandleSupabaseUser = async () => {
         const googleUserId = await fetchGoogleUserId();
         if (googleUserId) {
-            handleSupabaseUser(googleUserId);
+            await handleSupabaseUser(googleUserId);
+            await fetchFriends();
+            await fetchFriendRequests();
         }
     };
 
@@ -56,7 +64,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         try {
             const { data, error } = await supabase
                 .from('profiles')
-                .select('id, avatar_url, username, platforms, play_count')
+                .select('id, avatar_url, username, platforms, play_count, friends')
                 .eq('google_user_id', googleUserId)
                 .single();
 
@@ -70,11 +78,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                 setUsername(data.username);
                 setPlatforms(data.platforms || []);
                 setPlayCount(data.play_count || {});
+                setFriendsList(data.friends || []);
             } else {
                 const { data: newUser, error: insertError } = await supabase
                     .from('profiles')
                     .insert({ google_user_id: googleUserId })
-                    .select('id, avatar_url, username, platforms, play_count')
+                    .select('id, avatar_url, username, platforms, play_count, friends')
                     .single();
 
                 if (insertError) {
@@ -86,9 +95,109 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                 setUsername(newUser.username);
                 setPlatforms(newUser.platforms || []);
                 setPlayCount(newUser.play_count || {});
+                setFriendsList(newUser.friends || []);
             }
         } catch (error) {
             console.error('Error handling Supabase user:', error);
+        }
+    };
+
+    const fetchFriends = async () => {
+        if (!supabaseUserId) return;
+
+        try {
+            const { data: userProfile, error } = await supabase
+                .from('profiles')
+                .select('friends')
+                .eq('id', supabaseUserId)
+                .single();
+
+            if (error) throw error;
+
+            if (userProfile && userProfile.friends.length > 0) {
+                const { data: friendProfiles, error: profilesError } = await supabase
+                    .from('profiles')
+                    .select('id, username, avatar_url, platforms')
+                    .in('id', userProfile.friends);
+
+                if (profilesError) throw profilesError;
+
+                setFriendsList(friendProfiles);
+            }
+        } catch (error) {
+            console.error('Error fetching friends:', error);
+        }
+    };
+
+    const fetchFriendRequests = async () => {
+        if (!supabaseUserId) return;
+
+        try {
+            const { data: requests, error } = await supabase
+                .from('friend_requests')
+                .select(`
+                    id,
+                    sender_id,
+                    profiles:profiles!sender_id (username, avatar_url)
+                `)
+                .eq('receiver_id', supabaseUserId)
+                .eq('status', 'pending');
+
+            if (error) throw error;
+
+            setFriendRequests(requests);
+        } catch (error) {
+            console.error('Error fetching friend requests:', error);
+        }
+    };
+
+    const sendFriendRequest = async (username: string) => {
+        try {
+            const { data: friendProfile, error } = await supabase
+                .from('profiles')
+                .select('id, username, avatar_url, platforms')
+                .eq('username', username)
+                .single();
+
+            if (error || !friendProfile) {
+                return false;
+            }
+
+            const { error: insertError } = await supabase
+                .from('friend_requests')
+                .insert({ sender_id: supabaseUserId, receiver_id: friendProfile.id, status: 'pending' });
+
+            if (insertError) throw insertError;
+
+            return true;
+        } catch (error) {
+            console.error('Error sending friend request:', error);
+            return false;
+        }
+    };
+
+    const handleAcceptFriendRequest = async (requestId: string, senderId: string) => {
+        try {
+            const { data: userProfile, error: fetchError } = await supabase
+                .from('profiles')
+                .select('friends')
+                .eq('id', supabaseUserId)
+                .single();
+
+            if (fetchError) throw fetchError;
+
+            const currentFriends = Array.isArray(userProfile.friends) ? userProfile.friends : [];
+            const updatedFriends = [...currentFriends, senderId];
+
+            await supabase.from('profiles').update({ friends: updatedFriends }).eq('id', supabaseUserId);
+            await supabase.from('profiles').update({ friends: updatedFriends }).eq('id', senderId);
+
+            await supabase.from('friend_requests').update({ status: 'accepted' }).eq('id', requestId);
+
+            setFriendsList([...friendsList, { id: senderId, ...userProfile }]);
+            setFriendRequests(friendRequests.filter((request) => request.id !== requestId));
+        } catch (error) {
+            console.error('Error accepting friend request:', error);
         }
     };
 
@@ -153,6 +262,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setUsername(null);
         setPlatforms(null);
         setPlayCount({});
+        setFriendsList([]);
+        setFriendRequests([]);
     };
 
     return (
@@ -167,6 +278,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                 updateProfile,
                 getPlayCount,
                 incrementPlayCount,
+                friendsList,
+                friendRequests,
+                sendFriendRequest,
+                handleAcceptFriendRequest,
             }}
         >
             {children}

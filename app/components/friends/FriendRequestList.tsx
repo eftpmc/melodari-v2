@@ -26,14 +26,14 @@ const FriendRequestList: React.FC = () => {
                         <div key={request.id} className="flex items-center p-2 bg-base-100 rounded-md shadow-md w-full">
                             <div className="flex items-center">
                                 <img
-                                    src={request.profiles.avatar_url || "/default-avatar.png"}
-                                    alt={`${request.profiles.username}'s avatar`}
+                                    src={request.profiles?.avatar_url || "/default-avatar.png"}
+                                    alt={`${request.profiles?.username || 'User'}'s avatar`}
                                     className="w-16 h-16 object-cover rounded-lg mr-4"
                                 />
                                 <div className="flex flex-col">
-                                    <div className="text-base-content font-semibold">{request.profiles.username}</div>
+                                    <div className="text-base-content font-semibold">{request.profiles?.username || 'Unknown User'}</div>
                                     <div className="flex mt-2 space-x-2">
-                                        {request.profiles.platforms.map((platformId: string) => {
+                                        {(request.profiles?.platforms || []).map((platformId: string) => {
                                             const platform = platformsData.find((p) => p.id === platformId);
                                             return platform ? platform.icon : null;
                                         })}
@@ -71,14 +71,14 @@ const FriendRequestList: React.FC = () => {
                         <div key={request.id} className="flex items-center p-2 bg-base-100 rounded-md shadow-md w-full">
                             <div className="flex items-center">
                                 <img
-                                    src={request.profiles.avatar_url || "/default-avatar.png"}
-                                    alt={`${request.profiles.username}'s avatar`}
+                                    src={request.profiles?.avatar_url || "/default-avatar.png"}
+                                    alt={`${request.profiles?.username || 'User'}'s avatar`}
                                     className="w-16 h-16 object-cover rounded-lg mr-4"
                                 />
                                 <div className="flex flex-col">
-                                    <div className="text-base-content font-semibold">{request.profiles.username}</div>
+                                    <div className="text-base-content font-semibold">{request.profiles?.username || 'Unknown User'}</div>
                                     <div className="flex mt-2 space-x-2">
-                                        {request.profiles.platforms.map((platformId: string) => {
+                                        {(request.profiles?.platforms || []).map((platformId: string) => {
                                             const platform = platformsData.find((p) => p.id === platformId);
                                             return platform ? platform.icon : null;
                                         })}
