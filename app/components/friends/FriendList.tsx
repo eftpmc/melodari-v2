@@ -10,7 +10,7 @@ const FriendList: React.FC = () => {
         <div className="mb-6">
             <h3 className="text-xl font-semibold text-base-content mb-4">Your Friends</h3>
             {friendsList.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {friendsList.map((user: User) => (
                         <FriendCard key={user.id} user={user} />
                     ))}

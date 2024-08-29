@@ -19,11 +19,11 @@ const FriendRequestList: React.FC = () => {
 
     return (
         <div className="mb-6">
-            <h3 className="text-xl font-semibold text-base-content mb-4">Incoming Friend Requests</h3>
+            <h3 className="text-xl font-semibold text-base-content mb-4">Incoming</h3>
             {friendRequests.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {friendRequests.map((request: FriendRequest) => (
-                        <div key={request.id} className="flex items-center p-2 bg-base-100 rounded-md shadow-md w-full">
+                        <div key={request.id} className="flex flex-col sm:flex-row items-center p-4 bg-base-100 rounded-md shadow-md">
                             <div className="flex items-center">
                                 <img
                                     src={request.profiles?.avatar_url || "/default-avatar.png"}
@@ -40,7 +40,7 @@ const FriendRequestList: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="ml-auto flex space-x-2">
+                            <div className="ml-auto flex space-x-2 mt-4 sm:mt-0">
                                 <button
                                     className="btn btn-primary text-base-100"
                                     onClick={() => handleAcceptFriendRequest(request.id, request.sender_id)}
@@ -58,17 +58,17 @@ const FriendRequestList: React.FC = () => {
                     ))}
                 </div>
             ) : (
-                <div className="flex flex-col items-center justify-center h-32 bg-base-100 rounded-md shadow-md">
-                    <p className="text-lg font-semibold text-base-content">No Incoming Friend Requests</p>
-                    <p className="text-sm text-gray-500">You have no pending friend requests at the moment.</p>
+                <div className="flex flex-col items-center justify-center h-32 bg-base-100 rounded-md shadow-md p-2">
+                    <p className="text-lg font-semibold text-base-content text-center">No Incoming Friend Requests</p>
+                    <p className="text-sm text-gray-500 text-center">You have no pending friend requests at the moment.</p>
                 </div>
             )}
 
-            <h3 className="text-xl font-semibold text-base-content mb-4 mt-8">Outgoing Friend Requests</h3>
+            <h3 className="text-xl font-semibold text-base-content mb-4 mt-8">Outgoing</h3>
             {outgoingFriendRequests.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {outgoingFriendRequests.map((request: FriendRequest) => (
-                        <div key={request.id} className="flex items-center p-2 bg-base-100 rounded-md shadow-md w-full">
+                        <div key={request.id} className="flex flex-col sm:flex-row items-center p-4 bg-base-100 rounded-md shadow-md">
                             <div className="flex items-center">
                                 <img
                                     src={request.profiles?.avatar_url || "/default-avatar.png"}
@@ -85,7 +85,7 @@ const FriendRequestList: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="ml-auto flex space-x-2">
+                            <div className="ml-auto flex space-x-2 mt-4 sm:mt-0">
                                 <button className="btn btn-outline" onClick={() => handleDeclineFriendRequest(request.id)}>
                                     Cancel Request
                                 </button>
@@ -94,9 +94,9 @@ const FriendRequestList: React.FC = () => {
                     ))}
                 </div>
             ) : (
-                <div className="flex flex-col items-center justify-center h-32 bg-base-100 rounded-md shadow-md">
-                    <p className="text-lg font-semibold text-base-content">No Outgoing Friend Requests</p>
-                    <p className="text-sm text-gray-500">You have no pending outgoing requests.</p>
+                <div className="flex flex-col items-center justify-center h-32 bg-base-100 rounded-md shadow-md p-2">
+                    <p className="text-lg font-semibold text-base-content text-center">No Outgoing Friend Requests</p>
+                    <p className="text-sm text-gray-500 text-center">You have no pending outgoing requests.</p>
                 </div>
             )}
         </div>
