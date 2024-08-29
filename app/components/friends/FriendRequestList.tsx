@@ -23,7 +23,7 @@ const FriendRequestList: React.FC = () => {
             {friendRequests.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {friendRequests.map((request: FriendRequest) => (
-                        <div key={request.id} className="flex items-center p-4 bg-base-100 rounded-md shadow-md w-full">
+                        <div key={request.id} className="flex items-center p-2 bg-base-100 rounded-md shadow-md w-full">
                             <div className="flex items-center">
                                 <img
                                     src={request.profiles.avatar_url || "/default-avatar.png"}
@@ -68,7 +68,7 @@ const FriendRequestList: React.FC = () => {
             {outgoingFriendRequests.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {outgoingFriendRequests.map((request: FriendRequest) => (
-                        <div key={request.id} className="flex items-center p-4 bg-base-100 rounded-md shadow-md w-full">
+                        <div key={request.id} className="flex items-center p-2 bg-base-100 rounded-md shadow-md w-full">
                             <div className="flex items-center">
                                 <img
                                     src={request.profiles.avatar_url || "/default-avatar.png"}

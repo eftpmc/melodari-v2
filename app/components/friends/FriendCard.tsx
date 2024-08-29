@@ -14,11 +14,11 @@ const platformsData = [
 
 const FriendCard: React.FC<FriendCardProps> = ({ user }) => {
     return (
-        <div className="bg-base-100 p-4 rounded-lg shadow-md w-contain flex items-center cursor-pointer">
+        <div className="bg-base-100 p-2 rounded-lg shadow-md w-contain flex items-center cursor-pointer">
             <img
                 src={user.avatar_url || "/default-avatar.png"}
                 alt={`${user.username}'s avatar`}
-                className="w-12 h-12 object-cover rounded-lg"
+                className="w-16 h-16 object-cover rounded-lg"
             />
             <div className="ml-4 flex-1">
                 <div className="text-base-content font-semibold">{user.username}</div>
