@@ -9,6 +9,7 @@ interface PlaylistCardProps {
 }
 
 const PlaylistCard: React.FC<PlaylistCardProps> = ({ playlist, onClick }) => {
+
   const platformIcons: { [key: string]: React.JSX.Element } = {
     google: <SiYoutubemusic className="text-red-500 w-6 h-6" />,
     spotify: <FaSpotify className="text-green-500 w-6 h-6" />,

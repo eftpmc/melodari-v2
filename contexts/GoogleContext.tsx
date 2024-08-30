@@ -30,6 +30,7 @@ interface GoogleContextType {
     createGooglePlaylist: (title: string, description?: string) => Promise<GooglePlaylist | null>;
     matchSongsOnGoogle: (songs: Song[]) => Promise<GoogleSong[]>;
     addSongsToGooglePlaylist: (playlistId: string, songs: GoogleSong[]) => Promise<void>;
+    refreshPlaylists: () => Promise<void>;
 }
 
 interface GoogleProviderProps {
@@ -229,28 +230,31 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
     const loadPlaylists = async () => {
         let validatedPlaylists: Playlist[] = [];
 
-        // Validate and add stored playlists
         if (Object.keys(storedGooglePlaylists).length > 0) {
             validatedPlaylists = validatePlaylists(Object.values(storedGooglePlaylists));
         }
 
-        // Fetch and validate new playlists
         const fetchedPlaylists = await fetchGooglePlaylists();
         if (fetchedPlaylists) {
             const newValidatedPlaylists = validatePlaylists(fetchedPlaylists);
 
-            // Merge playlists ensuring no duplicates
             const mergedPlaylists = validatePlaylists([...validatedPlaylists, ...newValidatedPlaylists]);
 
-            // Update state and store with the final list of unique playlists
             dispatch(UpdateGooglePlaylists(mergedPlaylists));
             setPlaylists(mergedPlaylists);
         } else {
-            // If no new playlists are fetched, use the stored ones
             setPlaylists(validatedPlaylists);
         }
     };
 
+    const refreshPlaylists = async () => {
+        const fetchedPlaylists = await fetchGooglePlaylists();
+        if (fetchedPlaylists) {
+            const newValidatedPlaylists = validatePlaylists(fetchedPlaylists);
+            dispatch(UpdateGooglePlaylists(newValidatedPlaylists));
+            setPlaylists(newValidatedPlaylists);
+        }
+    };
 
     const fetchSongsForPlaylist = async (playlistId: string): Promise<Song[]> => {
         const playlist = playlists.find(p => p.id === playlistId);
@@ -506,6 +510,7 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
                 createGooglePlaylist,
                 matchSongsOnGoogle,
                 addSongsToGooglePlaylist,
+                refreshPlaylists,
             }}
         >
             {children}

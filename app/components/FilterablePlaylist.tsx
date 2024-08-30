@@ -1,23 +1,20 @@
-"use client";
-
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Playlist } from '@/types';
 import PlaylistCard from './PlaylistCard';
 import PlaylistModal from './PlaylistModal';
+import { useGoogleContext } from '@/contexts/GoogleContext';
+import { useSpotifyContext } from '@/contexts/SpotifyContext';
+import { Playlist } from '@/types';
 
-interface FilterablePlaylistProps {
-  googlePlaylists: Playlist[];
-  spotifyPlaylists: Playlist[];
-}
-
-export default function FilterablePlaylist({ googlePlaylists = [], spotifyPlaylists = [] }: FilterablePlaylistProps) {
+export default function FilterablePlaylist() {
   const [filter, setFilter] = useState<'All' | 'YouTube Music' | 'Spotify'>('All');
   const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
   const [loading, setLoading] = useState(true);
   const [playCounts, setPlayCounts] = useState<{ [id: string]: number }>({});
 
   const { getPlayCount, incrementPlayCount } = useAuth();
+  const { playlists: googlePlaylists, refreshPlaylists: refreshGooglePlaylists } = useGoogleContext();
+  const { playlists: spotifyPlaylists, refreshPlaylists: refreshSpotifyPlaylists } = useSpotifyContext();
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -39,6 +36,17 @@ export default function FilterablePlaylist({ googlePlaylists = [], spotifyPlayli
 
     fetchPlayCounts();
   }, [googlePlaylists, spotifyPlaylists, getPlayCount]);
+
+  const refreshAllPlaylists = async () => {
+    setLoading(true);
+    await refreshGooglePlaylists();
+    await refreshSpotifyPlaylists();
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    refreshAllPlaylists();
+  }, []); // This will refresh the playlists when the component mounts
 
   const combinedPlaylists = useMemo(() => {
     const playlistMap: { [title: string]: Playlist } = {};

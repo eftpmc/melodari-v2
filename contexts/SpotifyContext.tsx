@@ -27,6 +27,7 @@ interface SpotifyContextType {
     createSpotifyPlaylist: (title: string, description?: string) => Promise<SpotifyPlaylist | null>;
     matchSongsOnSpotify: (songs: Song[]) => Promise<SpotifyTrack[]>;
     addSongsToSpotifyPlaylist: (playlistId: string, songs: SpotifyTrack[]) => Promise<void>;
+    refreshPlaylists: () => Promise<void>;
 }
 
 interface SpotifyProviderProps {
@@ -365,6 +366,49 @@ export const SpotifyProvider = ({ children }: SpotifyProviderProps) => {
     
         return null;
     };
+
+    const refreshPlaylists = async () => {
+        if (spotifyTokens?.access_token) {
+            try {
+                const res = await fetch('https://api.spotify.com/v1/me/playlists', {
+                    method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${spotifyTokens.access_token}`,
+                        Accept: 'application/json',
+                    },
+                });
+
+                if (res.ok) {
+                    const data: PlaylistsResponse = await res.json();
+                    const transformedPlaylists = data.items.map((playlist) => ({
+                        id: playlist.id,
+                        title: playlist.name,
+                        accountName: playlist.owner.display_name,
+                        source: "spotify",
+                        description: playlist.description,
+                        thumbnails: {
+                            default: playlist.images[0]?.url || '',
+                            medium: playlist.images[0]?.url || '',
+                            high: playlist.images[0]?.url || '',
+                        },
+                        songs: [],
+                        platforms: ['spotify'],
+                    }));
+                    dispatch(UpdateSpotifyPlaylists(transformedPlaylists));
+                    setPlaylists(transformedPlaylists);
+                } else if (res.status === 401) {
+                    const refreshed = await refreshSpotifyTokens();
+                    if (refreshed) {
+                        await refreshPlaylists();
+                    }
+                } else {
+                    console.error('Failed to fetch Spotify playlists:', res.statusText);
+                }
+            } catch (error) {
+                console.error('Error fetching Spotify playlists:', error);
+            }
+        }
+    };
     
     return (
         <SpotifyContext.Provider
@@ -380,6 +424,7 @@ export const SpotifyProvider = ({ children }: SpotifyProviderProps) => {
                 logoutSpotify: handleLogoutSpotify,
                 checkIfSpotifyAuthenticated,
                 refreshSpotifyTokens,
+                refreshPlaylists,
             }}
         >
             {children}

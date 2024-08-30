@@ -8,6 +8,7 @@ import SongItem from './SongItem';
 import { FaSpotify } from 'react-icons/fa';
 import { SiYoutubemusic } from 'react-icons/si';
 import { Plus } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 interface PlaylistModalProps {
   playlist: Playlist;
@@ -21,12 +22,19 @@ const platformsData = [
 ];
 
 const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
-  const { fetchSongsForPlaylist: fetchGoogleSongs, findGooglePlaylist, createGooglePlaylist, matchSongsOnGoogle, addSongsToGooglePlaylist } = useGoogleContext();
-  const { findSpotifyPlaylist, createSpotifyPlaylist, matchSongsOnSpotify, addSongsToSpotifyPlaylist } = useSpotifyContext();
+  const { fetchSongsForPlaylist: fetchGoogleSongs, findGooglePlaylist, createGooglePlaylist, matchSongsOnGoogle, addSongsToGooglePlaylist, refreshPlaylists: refreshGooglePlaylists } = useGoogleContext();
+  const { findSpotifyPlaylist, createSpotifyPlaylist, matchSongsOnSpotify, addSongsToSpotifyPlaylist, refreshPlaylists: refreshSpotifyPlaylists } = useSpotifyContext();
   const { fetchSongsForPlaylist: fetchSpotifySongs } = useSpotifyContext();
   const [loading, setLoading] = useState(true);
   const [songs, setSongs] = useState<Song[]>([]);
   const [openSongIndex, setOpenSongIndex] = useState<number | null>(null);
+
+  const refreshAllPlaylists = async () => {
+    setLoading(true);
+    await refreshGooglePlaylists();
+    await refreshSpotifyPlaylists();
+    setLoading(false);
+  };
 
   useEffect(() => {
     const loadSongs = async () => {
@@ -53,37 +61,44 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
     setLoading(true);
 
     try {
-      if (platformId === 'google') {
-        let googlePlaylist = await findGooglePlaylist(playlist.title);
+        if (platformId === 'google') {
+            let googlePlaylist = await findGooglePlaylist(playlist.title);
 
-        if (!googlePlaylist) {
-          googlePlaylist = await createGooglePlaylist(playlist.title, playlist.description);
+            if (!googlePlaylist) {
+                googlePlaylist = await createGooglePlaylist(playlist.title, playlist.description);
+            }
+
+            if (googlePlaylist) {
+                const matchedSongs = await matchSongsOnGoogle(songs);
+                await addSongsToGooglePlaylist(googlePlaylist.id, matchedSongs);
+                playlist.platforms.push('google'); // Add to platforms
+                toast.success('Added to YouTube Music successfully!');
+            }
         }
 
-        if (googlePlaylist) {
-          const matchedSongs = await matchSongsOnGoogle(songs);
-          await addSongsToGooglePlaylist(googlePlaylist.id, matchedSongs);
-          playlist.platforms.push('google'); // Add to platforms
-        }
-      }
+        if (platformId === 'spotify') {
+            let spotifyPlaylist = await findSpotifyPlaylist(playlist.title);
 
-      if (platformId === 'spotify') {
-        let spotifyPlaylist = await findSpotifyPlaylist(playlist.title);
+            if (!spotifyPlaylist) {
+                spotifyPlaylist = await createSpotifyPlaylist(playlist.title, playlist.description);
+            }
 
-        if (!spotifyPlaylist) {
-          spotifyPlaylist = await createSpotifyPlaylist(playlist.title, playlist.description);
+            if (spotifyPlaylist) {
+                const matchedSongs = await matchSongsOnSpotify(songs);
+                await addSongsToSpotifyPlaylist(spotifyPlaylist.id, matchedSongs);
+                playlist.platforms.push('spotify'); // Add to platforms
+                toast.success('Added to Spotify successfully!');
+            }
         }
 
-        if (spotifyPlaylist) {
-          const matchedSongs = await matchSongsOnSpotify(songs);
-          await addSongsToSpotifyPlaylist(spotifyPlaylist.id, matchedSongs);
-          playlist.platforms.push('spotify'); // Add to platforms
-        }
-      }
+        // Refresh playlists after adding the platform
+        await refreshAllPlaylists();
+
     } catch (error) {
-      console.error('Error adding platform:', error);
+        console.error('Error adding platform:', error);
+        toast.error('Failed to add platform. Please try again.');
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
   };
 
