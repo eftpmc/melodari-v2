@@ -38,10 +38,7 @@ export default function Home() {
 
   return (
     <div className="py-4 bg-base-300">
-      <FilterablePlaylist 
-        googlePlaylists={googlePlaylists} 
-        spotifyPlaylists={spotifyPlaylists} 
-      />
+      <FilterablePlaylist/>
     </div>
   );
 }
