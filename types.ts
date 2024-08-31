@@ -89,7 +89,7 @@ export interface SpotifyPlaylist {
 export interface User {
   id: string;
   username: string;
-  avatar_url: string | null;
+  avatar_url: string;
   platforms: string[];
 }
 
@@ -98,8 +98,8 @@ export interface FriendRequest {
   id: string;
   sender_id: string;
   profiles: {
-    username: string;
-    avatar_url: string | null;
-    platforms: string[];
+      username: string;
+      avatar_url: string | null;
+      platforms: string[];
   };
 }

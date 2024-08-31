@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useProfile } from '@/contexts/ProfileContext';
 import PlaylistCard from './PlaylistCard';
 import PlaylistModal from './PlaylistModal';
 import { useGoogleContext } from '@/contexts/GoogleContext';
@@ -12,7 +12,7 @@ export default function FilterablePlaylist() {
   const [loading, setLoading] = useState(true);
   const [playCounts, setPlayCounts] = useState<{ [id: string]: number }>({});
 
-  const { getPlayCount, incrementPlayCount } = useAuth();
+  const { getPlayCount, incrementPlayCount } = useProfile();
   const { playlists: googlePlaylists, refreshPlaylists: refreshGooglePlaylists } = useGoogleContext();
   const { playlists: spotifyPlaylists, refreshPlaylists: refreshSpotifyPlaylists } = useSpotifyContext();
 

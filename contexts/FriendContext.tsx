@@ -1,126 +1,60 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { FriendRequest } from '@/types';
-import { createClient } from '@/utils/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { FriendRequest, User } from '@/types';
+import { supabaseOperations } from '@/utils/supabase/operations';
+import { useProfile } from '@/contexts/ProfileContext';
 import toast from 'react-hot-toast';
 
-const FriendContext = createContext<any | null>(null);
+interface FriendContextType {
+    friendsList: User[];
+    friendRequests: FriendRequest[];
+    outgoingFriendRequests: FriendRequest[];
+    sendFriendRequest: (username: string) => Promise<boolean>;
+    handleAcceptFriendRequest: (requestId: string, senderId: string) => Promise<void>;
+    handleDeclineFriendRequest: (requestId: string) => Promise<void>;
+    loading: boolean;
+}
+
+const FriendContext = createContext<FriendContextType | null>(null);
 
 export const FriendProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { supabaseUserId, username: currentUsername } = useAuth();
-    const [friendsList, setFriendsList] = useState<any[]>([]);
-    const [friendRequests, setFriendRequests] = useState<any[]>([]);
-    const [outgoingFriendRequests, setOutgoingFriendRequests] = useState<any[]>([]);
+    const { supabaseUserId } = useProfile();
+    const [friendsList, setFriendsList] = useState<User[]>([]);
+    const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
+    const [outgoingFriendRequests, setOutgoingFriendRequests] = useState<FriendRequest[]>([]);
     const [loading, setLoading] = useState(true);
-    const supabase = createClient();
-
-    const fetchFriends = async () => {
-        try {
-            const { data: userProfile, error } = await supabase
-                .from('profiles')
-                .select('friends')
-                .eq('id', supabaseUserId)
-                .single();
-
-            if (error) throw error;
-
-            if (userProfile && userProfile.friends.length > 0) {
-                const { data: friendProfiles, error: profilesError } = await supabase
-                    .from('profiles')
-                    .select('id, username, avatar_url, platforms')
-                    .in('id', userProfile.friends);
-
-                if (profilesError) throw profilesError;
-
-                // Exclude the current user from their own friends list
-                const filteredFriends = friendProfiles.filter(friend => friend.id !== supabaseUserId);
-
-                setFriendsList(filteredFriends);
-            }
-        } catch (error) {
-            console.error('Error fetching friends:', error);
-        }
-    };
-
-    const fetchFriendRequests = async () => {
-        try {
-            const { data: requests, error } = await supabase
-                .from('friend_requests')
-                .select(`
-                    id,
-                    sender_id,
-                    profiles:profiles!sender_id (username, avatar_url, platforms)
-                `)
-                .eq('receiver_id', supabaseUserId)
-                .eq('status', 'pending');
-
-            if (error) throw error;
-
-            setFriendRequests(requests);
-        } catch (error) {
-            console.error('Error fetching friend requests:', error);
-        }
-    };
-
-    const fetchOutgoingFriendRequests = async () => {
-        try {
-            const { data: requests, error } = await supabase
-                .from('friend_requests')
-                .select(`
-                    id,
-                    receiver_id,
-                    profiles:profiles!receiver_id (username, avatar_url, platforms)
-                `)
-                .eq('sender_id', supabaseUserId)
-                .eq('status', 'pending');
-    
-            if (error) throw error;
-    
-            setOutgoingFriendRequests(requests);
-        } catch (error) {
-            console.error('Error fetching outgoing friend requests:', error);
-        }
-    };
 
     useEffect(() => {
+        if (supabaseUserId) {
+            initializeData();
+        }
+    }, [supabaseUserId]);
+
+    const initializeData = async () => {
         if (!supabaseUserId) return;
-
-        const initializeData = async () => {
-            await Promise.all([fetchFriends(), fetchFriendRequests(), fetchOutgoingFriendRequests()]);
+        setLoading(true);
+        try {
+            const [friends, incomingRequests, outgoingRequests] = await Promise.all([
+                supabaseOperations.getFriends(supabaseUserId),
+                supabaseOperations.getFriendRequests(supabaseUserId),
+                supabaseOperations.getOutgoingFriendRequests(supabaseUserId)
+            ]);
+            setFriendsList(friends);
+            setFriendRequests(incomingRequests);
+            setOutgoingFriendRequests(outgoingRequests);
+        } catch (error) {
+            console.error('Error initializing friend data:', error);
+        } finally {
             setLoading(false);
-        };        
-
-        initializeData();
-    }, [supabaseUserId, supabase]);
+        }
+    };
 
     const sendFriendRequest = async (username: string) => {
+        if (!supabaseUserId) return false;
         try {
-            if (username === currentUsername) {
-                toast.error('You cannot send a friend request to yourself.');
-                return false;
-            }
-
-            const { data: friendProfile, error } = await supabase
-                .from('profiles')
-                .select('id, username, avatar_url, platforms')
-                .eq('username', username)
-                .single();
-
-                if (error || !friendProfile) {
-                    toast.error('Username not found. Please try again.');
-                    return false;
-                }
-
-            const { error: insertError } = await supabase
-                .from('friend_requests')
-                .insert({ sender_id: supabaseUserId, receiver_id: friendProfile.id, status: 'pending' });
-
-            if (insertError) throw insertError;
-
-            fetchOutgoingFriendRequests();
-
+            await supabaseOperations.sendFriendRequest(supabaseUserId, username);
+            await initializeData(); // Refresh all data
             toast.success('Friend request sent successfully!');
             return true;
         } catch (error) {
@@ -131,65 +65,20 @@ export const FriendProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
 
     const handleAcceptFriendRequest = async (requestId: string, senderId: string) => {
+        if (!supabaseUserId) return;
         try {
-            // Fetch current user's friends list
-            const { data: userProfile, error: fetchError } = await supabase
-                .from('profiles')
-                .select('friends')
-                .eq('id', supabaseUserId)
-                .single();
-    
-            if (fetchError) throw fetchError;
-    
-            const currentFriends = Array.isArray(userProfile.friends) ? userProfile.friends : [];
-            const updatedFriendsForReceiver = [...currentFriends, senderId];
-    
-            // Fetch sender's profile and friends list
-            const { data: senderProfile, error: senderFetchError } = await supabase
-                .from('profiles')
-                .select('username, avatar_url, platforms, friends')
-                .eq('id', senderId)
-                .single();
-    
-            if (senderFetchError) throw senderFetchError;
-    
-            const senderFriends = Array.isArray(senderProfile.friends) ? senderProfile.friends : [];
-            const updatedFriendsForSender = [...senderFriends, supabaseUserId];
-    
-            // Update both users' friends lists
-            await supabase.from('profiles').update({ friends: updatedFriendsForReceiver }).eq('id', supabaseUserId);
-            await supabase.from('profiles').update({ friends: updatedFriendsForSender }).eq('id', senderId);
-    
-            // Update the friend request status to accepted
-            await supabase.from('friend_requests').update({ status: 'accepted' }).eq('id', requestId);
-    
-            // Ensure senderProfile and other fields are defined before updating local state
-            const senderPlatforms = senderProfile?.platforms || [];
-            const newFriend = {
-                id: senderId,
-                username: senderProfile.username || 'Unknown',
-                avatar_url: senderProfile.avatar_url || '/default-avatar.png',
-                platforms: senderPlatforms
-            };
-    
-            setFriendsList([...friendsList, newFriend]);
-            setFriendRequests(friendRequests.filter((request) => request.id !== requestId));
+            await supabaseOperations.acceptFriendRequest(supabaseUserId, requestId, senderId);
+            await initializeData(); // Refresh all data
+            toast.success('Friend request accepted.');
         } catch (error) {
             console.error('Error accepting friend request:', error);
+            toast.error('Failed to accept friend request. Please try again.');
         }
-    };    
+    };
 
     const handleDeclineFriendRequest = async (requestId: string) => {
         try {
-            // Update the friend request status to declined
-            const { error } = await supabase
-                .from('friend_requests')
-                .update({ status: 'rejected' })
-                .eq('id', requestId);
-    
-            if (error) throw error;
-    
-            // Remove the declined request from the state
+            await supabaseOperations.declineFriendRequest(requestId);
             setFriendRequests(friendRequests.filter((request) => request.id !== requestId));
             toast.success('Friend request declined.');
         } catch (error) {

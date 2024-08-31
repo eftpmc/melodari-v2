@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useProfile } from '@/contexts/ProfileContext';
 import { FaSpotify, FaGoogle } from 'react-icons/fa';
 import { SiYoutubemusic } from 'react-icons/si';
 
@@ -12,7 +12,7 @@ const platformsData = [
 ];
 
 const ProfileSettings: React.FC = () => {
-  const { username, avatarUrl, platforms, updateProfile } = useAuth();
+  const { username, avatarUrl, platforms, updateProfile } = useProfile();
   const [newUsername, setNewUsername] = useState(username || '');
   const [newAvatarUrl, setNewAvatarUrl] = useState(avatarUrl || '');
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(platforms || []);
