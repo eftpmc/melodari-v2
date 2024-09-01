@@ -96,7 +96,7 @@ export default function Login() {
                         <FaGoogle className="w-5 h-5 text-base-200" />
                     )}
                 </button>
-                <button
+                {/* <button
                     onClick={handleSpotifyLogin}
                     className="btn btn-success flex items-center text-base-200 py-3 px-6 rounded-lg shadow-lg m-2 mb-0"
                     disabled={loadingSpotify}
@@ -106,7 +106,7 @@ export default function Login() {
                     ) : (
                         <FaSpotify className="w-5 h-5 text-base-200" />
                     )}
-                </button>
+                </button> */}
             </div>
         </div>
     );

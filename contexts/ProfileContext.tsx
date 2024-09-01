@@ -9,6 +9,10 @@ interface ProfileContextType {
     supabaseUserId: string | null;
     avatarUrl: string | null;
     username: string | null;
+    googlePlaylists: any;
+    spotifyPlaylists: any;
+    updateGooglePlaylists: (newGooglePlaylists: any) => Promise<void>;
+    updateSpotifyPlaylists: (newSpotifyPlaylists: any) => Promise<void>;
     platforms: string[];
     playCount: { [key: string]: number };
     friendsList: User[];
@@ -29,6 +33,8 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const [supabaseUserId, setSupabaseUserId] = useState<string | null>(null);
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
     const [username, setUsername] = useState<string | null>(null);
+    const [googlePlaylists, setGooglePlaylists] = useState<any>({});
+    const [spotifyPlaylists, setSpotifyPlaylists] = useState<any>({});
     const [platforms, setPlatforms] = useState<string[]>([]);
     const [playCount, setPlayCount] = useState<{ [key: string]: number }>({});
     const [friendsList, setFriendsList] = useState<User[]>([]);
@@ -53,11 +59,37 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
             setUsername(data.username);
             setPlatforms(data.platforms || []);
             setPlayCount(data.play_count || {});
-            
+            setGooglePlaylists(data.google_playlists || {});
+            setSpotifyPlaylists(data.spotify_playlists || {});
+
+
             await fetchFriends(data.id);
             await fetchFriendRequests(data.id);
         } catch (error) {
             console.error('Error fetching user profile:', error);
+        }
+    };
+
+
+    const updateGooglePlaylists = async (newGooglePlaylists: any) => {
+        if (!supabaseUserId) return;
+
+        try {
+            const updatedGooglePlaylists = await supabaseOperations.updateGooglePlaylists(supabaseUserId, newGooglePlaylists);
+            setGooglePlaylists(updatedGooglePlaylists);
+        } catch (error) {
+            console.error('Error updating Google playlists:', error);
+        }
+    };
+
+    const updateSpotifyPlaylists = async (newSpotifyPlaylists: any) => {
+        if (!supabaseUserId) return;
+
+        try {
+            const updatedSpotifyPlaylists = await supabaseOperations.updateSpotifyPlaylists(supabaseUserId, newSpotifyPlaylists);
+            setSpotifyPlaylists(updatedSpotifyPlaylists);
+        } catch (error) {
+            console.error('Error updating Spotify playlists:', error);
         }
     };
 
@@ -84,7 +116,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
             if (!supabaseUserId) throw new Error('No Supabase user ID');
 
             const updatedProfile = await supabaseOperations.updateProfile(supabaseUserId, newUsername, newAvatarUrl, newPlatforms);
-            
+
             setUsername(updatedProfile.username);
             setAvatarUrl(updatedProfile.avatar_url);
             setPlatforms(updatedProfile.platforms);
@@ -125,7 +157,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
         if (!supabaseUserId) return;
         try {
             const result = await supabaseOperations.acceptFriendRequest(supabaseUserId, requestId, senderId);
-            
+
             if (result && result.senderProfile) {
                 const newFriend: User = {
                     id: senderId,
@@ -133,7 +165,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     avatar_url: result.senderProfile.avatar_url || '/default-avatar.png',
                     platforms: result.senderProfile.platforms || []
                 };
-    
+
                 setFriendsList([...friendsList, newFriend]);
                 setFriendRequests(friendRequests.filter((request) => request.id !== requestId));
             }
@@ -157,6 +189,10 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 supabaseUserId,
                 avatarUrl,
                 username,
+                googlePlaylists,
+                spotifyPlaylists,
+                updateGooglePlaylists,
+                updateSpotifyPlaylists,
                 platforms,
                 playCount,
                 friendsList,

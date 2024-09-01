@@ -90,7 +90,6 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
             }
         }
 
-        // Refresh playlists after adding the platform
         await refreshAllPlaylists();
 
     } catch (error) {

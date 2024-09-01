@@ -7,7 +7,7 @@ export const supabaseOperations = {
   getUserProfile: async (googleUserId: string) => {
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, avatar_url, username, platforms, play_count, friends')
+      .select('id, avatar_url, username, platforms, play_count, friends, google_playlists, spotify_playlists')
       .eq('google_user_id', googleUserId)
       .single();
 
@@ -22,7 +22,7 @@ export const supabaseOperations = {
     const { data, error } = await supabase
       .from('profiles')
       .insert({ google_user_id: googleUserId })
-      .select('id, avatar_url, username, platforms, play_count, friends')
+      .select('id, avatar_url, username, platforms, play_count, friends, google_playlists, spotify_playlists')
       .single();
 
     if (error) {
@@ -30,6 +30,102 @@ export const supabaseOperations = {
     }
 
     return data;
+  },
+
+  updateGooglePlaylists: async (userId: string, googlePlaylists: any) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({ google_playlists: googlePlaylists, updated_at: new Date() })
+      .eq('id', userId)
+      .select('google_playlists')
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data.google_playlists;
+  },
+
+  updateSpotifyPlaylists: async (userId: string, spotifyPlaylists: any) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({ spotify_playlists: spotifyPlaylists, updated_at: new Date() })
+      .eq('id', userId)
+      .select('spotify_playlists')
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data.spotify_playlists;
+  },
+
+  updateGooglePlaylistSongs: async (userId: string, playlistId: string, newSongs: any) => {
+  const { data: userProfile, error: fetchError } = await supabase
+      .from('profiles')
+      .select('google_playlists')
+      .eq('id', userId)
+      .single();
+  
+    if (fetchError) {
+      throw fetchError;
+    }
+  
+    const googlePlaylists = userProfile.google_playlists || {};
+    const playlist = googlePlaylists[playlistId] || {};
+    playlist.songs = newSongs;
+    googlePlaylists[playlistId] = playlist;
+  
+    const { data, error: updateError } = await supabase
+      .from('profiles')
+      .update({
+        google_playlists: googlePlaylists,
+        updated_at: new Date(),
+      })
+      .eq('id', userId)
+      .select('google_playlists')
+      .single();
+  
+    if (updateError) {
+      throw updateError;
+    }
+  
+    return data.google_playlists;
+  },
+
+  updateSpotifyPlaylistSongs: async (userId: string, playlistId: string, newSongs: any) => {
+    const { data: userProfile, error: fetchError } = await supabase
+      .from('profiles')
+      .select('spotify_playlists')
+      .eq('id', userId)
+      .single();
+  
+    if (fetchError) {
+      throw fetchError;
+    }
+  
+    const spotifyPlaylists = userProfile.spotify_playlists || {};
+    const playlist = spotifyPlaylists[playlistId] || {};
+    playlist.songs = newSongs;
+    spotifyPlaylists[playlistId] = playlist;
+  
+    const { data, error: updateError } = await supabase
+      .from('profiles')
+      .update({
+        google_playlists: spotifyPlaylists,
+        updated_at: new Date(),
+      })
+      .eq('id', userId)
+      .select('spotify_playlists')
+      .single();
+  
+    if (updateError) {
+      throw updateError;
+    }
+  
+    return data.spotify_playlists;
   },
 
   updateProfile: async (userId: string, newUsername: string, newAvatarUrl: string, newPlatforms: string[]) => {

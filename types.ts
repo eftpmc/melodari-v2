@@ -91,6 +91,8 @@ export interface User {
   username: string;
   avatar_url: string;
   platforms: string[];
+  google_playlists?: {},
+  spotify_playlists?: {},
 }
 
 

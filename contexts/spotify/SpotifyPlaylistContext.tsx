@@ -1,13 +1,11 @@
-// SpotifyPlaylistContext.tsx
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@/utils/redux/store';
-import { clearSpotifyPlaylists, UpdateSpotifyPlaylists, UpdatePlaylistSongs } from '@/utils/redux/playlistSlice';
 import { SpotifyPlaylist, SpotifyTrack, Playlist, Song } from '@/types';
 import { spotifyApi } from '@/utils/spotify/api';
 import { useSpotifyAuthContext } from './SpotifyAuthContext';
+import { useProfile } from '@/contexts/ProfileContext';
+import { supabaseOperations } from '@/utils/supabase/operations';
 
 interface SpotifyPlaylistContextType {
     playlists: Playlist[];
@@ -27,9 +25,8 @@ interface SpotifyPlaylistProviderProps {
 export const SpotifyPlaylistContext = createContext<SpotifyPlaylistContextType | null>(null);
 
 export const SpotifyPlaylistProvider = ({ children }: SpotifyPlaylistProviderProps) => {
-    const dispatch = useDispatch();
-    const storedSpotifyPlaylists = useSelector((state: RootState) => state.playlists.spotify);
     const { isSpotifyAuth, spotifyTokens } = useSpotifyAuthContext();
+    const { spotifyPlaylists, updateSpotifyPlaylists, supabaseUserId } = useProfile();
 
     const [playlists, setPlaylists] = useState<Playlist[]>([]);
 
@@ -60,8 +57,8 @@ export const SpotifyPlaylistProvider = ({ children }: SpotifyPlaylistProviderPro
     const loadPlaylists = async () => {
         let validatedPlaylists: Playlist[] = [];
 
-        if (Object.keys(storedSpotifyPlaylists).length > 0) {
-            validatedPlaylists = validatePlaylists(Object.values(storedSpotifyPlaylists));
+        if (Object.keys(spotifyPlaylists).length > 0) {
+            validatedPlaylists = validatePlaylists(Object.values(spotifyPlaylists));
         }
 
         const fetchedPlaylists = await fetchSpotifyPlaylists();
@@ -70,8 +67,9 @@ export const SpotifyPlaylistProvider = ({ children }: SpotifyPlaylistProviderPro
 
             const mergedPlaylists = validatePlaylists([...validatedPlaylists, ...newValidatedPlaylists]);
 
-            dispatch(UpdateSpotifyPlaylists(mergedPlaylists));
             setPlaylists(mergedPlaylists);
+
+            await updateSpotifyPlaylists(validatedPlaylists);
         } else {
             setPlaylists(validatedPlaylists);
         }
@@ -81,8 +79,9 @@ export const SpotifyPlaylistProvider = ({ children }: SpotifyPlaylistProviderPro
         const fetchedPlaylists = await fetchSpotifyPlaylists();
         if (fetchedPlaylists) {
             const newValidatedPlaylists = validatePlaylists(fetchedPlaylists);
-            dispatch(UpdateSpotifyPlaylists(newValidatedPlaylists));
             setPlaylists(newValidatedPlaylists);
+
+            await updateSpotifyPlaylists(newValidatedPlaylists);
         }
     };
 
@@ -132,7 +131,9 @@ export const SpotifyPlaylistProvider = ({ children }: SpotifyPlaylistProviderPro
                     },
                 }));
 
-                dispatch(UpdatePlaylistSongs({ playlistId, songs: fetchedSongs }));
+                if (supabaseUserId){
+                    await supabaseOperations.updateSpotifyPlaylistSongs(supabaseUserId, playlistId, fetchedSongs);
+                }
 
                 setPlaylists(prevPlaylists => prevPlaylists.map(p =>
                     p.id === playlistId ? { ...p, songs: fetchedSongs } : p

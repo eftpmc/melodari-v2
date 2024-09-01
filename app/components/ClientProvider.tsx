@@ -21,16 +21,16 @@ export default function ClientProvider({ children }: { children: ReactNode }) {
                 <SpotifyAuthProvider>
                     <GoogleAuthProvider>
                         <AuthProvider>
-                            <GooglePlaylistProvider>
-                                <SpotifyPlaylistProvider>
-                                    <ProfileProvider>
+                            <ProfileProvider>
+                                <GooglePlaylistProvider>
+                                    <SpotifyPlaylistProvider>
                                         <FriendProvider>
                                             {children}
                                             <Toaster position="bottom-right" reverseOrder={false} />
                                         </FriendProvider>
-                                    </ProfileProvider>
-                                </SpotifyPlaylistProvider>
-                            </GooglePlaylistProvider>
+                                    </SpotifyPlaylistProvider>
+                                </GooglePlaylistProvider>
+                            </ProfileProvider>
                         </AuthProvider>
                     </GoogleAuthProvider>
                 </SpotifyAuthProvider>

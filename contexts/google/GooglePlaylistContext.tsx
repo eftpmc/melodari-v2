@@ -2,12 +2,11 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@/utils/redux/store';
-import { clearGooglePlaylists, UpdateGooglePlaylists, UpdatePlaylistSongs } from '@/utils/redux/playlistSlice';
 import { GooglePlaylist, GoogleSong, Playlist, Song } from '@/types';
 import { googleApi } from '@/utils/google/api';
 import { useGoogleAuthContext } from './GoogleAuthContext';
+import { useProfile } from '@/contexts/ProfileContext';
+import { supabaseOperations } from '@/utils/supabase/operations';
 
 interface GooglePlaylistContextType {
     playlists: Playlist[];
@@ -27,9 +26,8 @@ interface GooglePlaylistProviderProps {
 export const GooglePlaylistContext = createContext<GooglePlaylistContextType | null>(null);
 
 export const GooglePlaylistProvider = ({ children }: GooglePlaylistProviderProps) => {
-    const dispatch = useDispatch();
-    const storedGooglePlaylists = useSelector((state: RootState) => state.playlists.google);
     const { isGoogleAuth, googleTokens } = useGoogleAuthContext();
+    const { googlePlaylists, updateGooglePlaylists, supabaseUserId } = useProfile();
 
     const [playlists, setPlaylists] = useState<Playlist[]>([]);
 
@@ -60,8 +58,8 @@ export const GooglePlaylistProvider = ({ children }: GooglePlaylistProviderProps
     const loadPlaylists = async () => {
         let validatedPlaylists: Playlist[] = [];
 
-        if (Object.keys(storedGooglePlaylists).length > 0) {
-            validatedPlaylists = validatePlaylists(Object.values(storedGooglePlaylists));
+        if (Object.keys(googlePlaylists).length > 0) {
+            validatedPlaylists = validatePlaylists(Object.values(googlePlaylists));
         }
 
         const fetchedPlaylists = await fetchGooglePlaylists();
@@ -70,7 +68,7 @@ export const GooglePlaylistProvider = ({ children }: GooglePlaylistProviderProps
 
             const mergedPlaylists = validatePlaylists([...validatedPlaylists, ...newValidatedPlaylists]);
 
-            dispatch(UpdateGooglePlaylists(mergedPlaylists));
+            await updateGooglePlaylists(mergedPlaylists);
             setPlaylists(mergedPlaylists);
         } else {
             setPlaylists(validatedPlaylists);
@@ -81,7 +79,8 @@ export const GooglePlaylistProvider = ({ children }: GooglePlaylistProviderProps
         const fetchedPlaylists = await fetchGooglePlaylists();
         if (fetchedPlaylists) {
             const newValidatedPlaylists = validatePlaylists(fetchedPlaylists);
-            dispatch(UpdateGooglePlaylists(newValidatedPlaylists));
+
+            updateGooglePlaylists(newValidatedPlaylists)
             setPlaylists(newValidatedPlaylists);
         }
     };
@@ -132,7 +131,9 @@ export const GooglePlaylistProvider = ({ children }: GooglePlaylistProviderProps
                     },
                 }));
 
-                dispatch(UpdatePlaylistSongs({ playlistId, songs: fetchedSongs }));
+                if (supabaseUserId) {
+                    await supabaseOperations.updateGooglePlaylistSongs(supabaseUserId, playlistId, fetchedSongs);
+                }
 
                 setPlaylists(prevPlaylists => prevPlaylists.map(p =>
                     p.id === playlistId ? { ...p, songs: fetchedSongs } : p
@@ -221,20 +222,20 @@ export const GooglePlaylistProvider = ({ children }: GooglePlaylistProviderProps
 
     const matchSongsOnGoogle = async (songs: Song[]): Promise<GoogleSong[]> => {
         const matchedSongs: GoogleSong[] = [];
-    
+
         for (const song of songs) {
             const matchedSong = await searchSongOnGoogle(song.title, song.artist);
             if (matchedSong) {
                 matchedSongs.push(matchedSong);
             }
         }
-    
+
         return matchedSongs;
     };
-    
+
     const addSongsToGooglePlaylist = async (playlistId: string, songs: GoogleSong[]) => {
         if (!googleTokens?.access_token) return;
-    
+
         try {
             for (const song of songs) {
                 await googleApi.addVideoToPlaylist(googleTokens.access_token, playlistId, song.id);
@@ -243,10 +244,10 @@ export const GooglePlaylistProvider = ({ children }: GooglePlaylistProviderProps
             console.error('Error adding songs to Google playlist:', error);
         }
     };
-    
+
     const searchSongOnGoogle = async (title: string, artist?: string): Promise<GoogleSong | null> => {
         if (!googleTokens?.access_token) return null;
-    
+
         try {
             const query = artist ? `${title} ${artist}` : title;
             const data = await googleApi.searchVideos(googleTokens.access_token, query);
@@ -266,10 +267,10 @@ export const GooglePlaylistProvider = ({ children }: GooglePlaylistProviderProps
         } catch (error) {
             console.error('Error searching for song on Google:', error);
         }
-    
+
         return null;
     };
-    
+
     return (
         <GooglePlaylistContext.Provider
             value={{
@@ -286,6 +287,6 @@ export const GooglePlaylistProvider = ({ children }: GooglePlaylistProviderProps
             {children}
         </GooglePlaylistContext.Provider>
     );
-    };
-    
-    export const useGooglePlaylistContext = () => useContext(GooglePlaylistContext) as GooglePlaylistContextType;
+};
+
+export const useGooglePlaylistContext = () => useContext(GooglePlaylistContext) as GooglePlaylistContextType;
