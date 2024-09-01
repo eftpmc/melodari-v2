@@ -43,8 +43,20 @@ export const spotifyApi = {
     return response.json();
   },
 
-  createPlaylist: async (accessToken: string, userId: string, name: string, description?: string) => {
-    const response = await fetch(`${BASE_URL}/users/${userId}/playlists`, {
+  createPlaylist: async (accessToken: string, name: string, description?: string) => {
+    const userRes = await fetch(`https://api.spotify.com/v1/me`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: 'application/json',
+      },
+    });
+
+    if (!userRes.ok) throw new Error('Failed to fetch Spotify user info');
+
+    const user = await userRes.json();
+
+    const response = await fetch(`${BASE_URL}/users/${user.id}/playlists`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
