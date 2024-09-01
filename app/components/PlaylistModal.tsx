@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { Playlist, Song } from '@/types';
-import { useGoogleContext } from '@/contexts/GoogleContext';
-import { useSpotifyContext } from '@/contexts/SpotifyContext';
+import { useGooglePlaylistContext } from '@/contexts/google/GooglePlaylistContext';
+import { useSpotifyPlaylistContext } from '@/contexts/spotify/SpotifyPlaylistContext';
 import SongItem from './SongItem';
 import { FaSpotify } from 'react-icons/fa';
 import { SiYoutubemusic } from 'react-icons/si';
@@ -22,9 +22,8 @@ const platformsData = [
 ];
 
 const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
-  const { fetchSongsForPlaylist: fetchGoogleSongs, findGooglePlaylist, createGooglePlaylist, matchSongsOnGoogle, addSongsToGooglePlaylist, refreshPlaylists: refreshGooglePlaylists } = useGoogleContext();
-  const { findSpotifyPlaylist, createSpotifyPlaylist, matchSongsOnSpotify, addSongsToSpotifyPlaylist, refreshPlaylists: refreshSpotifyPlaylists } = useSpotifyContext();
-  const { fetchSongsForPlaylist: fetchSpotifySongs } = useSpotifyContext();
+  const { fetchSongsForPlaylist: fetchGoogleSongs, findGooglePlaylist, createGooglePlaylist, matchSongsOnGoogle, addSongsToGooglePlaylist, refreshPlaylists: refreshGooglePlaylists } = useGooglePlaylistContext();
+  const { findSpotifyPlaylist, createSpotifyPlaylist, matchSongsOnSpotify, addSongsToSpotifyPlaylist, refreshPlaylists: refreshSpotifyPlaylists, fetchSongsForPlaylist: fetchSpotifySongs } = useSpotifyPlaylistContext();
   const [loading, setLoading] = useState(true);
   const [songs, setSongs] = useState<Song[]>([]);
   const [openSongIndex, setOpenSongIndex] = useState<number | null>(null);

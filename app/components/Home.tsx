@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useGoogleContext } from '@/contexts/GoogleContext';
-import { useSpotifyContext } from '@/contexts/SpotifyContext';
+import { useGoogleAuthContext } from '@/contexts/google/GoogleAuthContext';
+import { useSpotifyAuthContext } from '@/contexts/spotify/SpotifyAuthContext';
 import FilterablePlaylist from '@/app/components/FilterablePlaylist';
 
 export default function Home() {
   const router = useRouter();
-  const { isGoogleAuth, playlists: googlePlaylists } = useGoogleContext();
-  const { isSpotifyAuth, playlists: spotifyPlaylists } = useSpotifyContext();
+  const { isGoogleAuth } = useGoogleAuthContext();
+  const { isSpotifyAuth } = useSpotifyAuthContext();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

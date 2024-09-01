@@ -5,11 +5,11 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setGoogleTokens, setTokens } from '@/utils/redux/authSlice';
 import { Loader2 } from "lucide-react";
-import { useGoogleContext } from "@/contexts/GoogleContext";
+import { useGoogleAuthContext } from "@/contexts/google/GoogleAuthContext";
 
 export default function OAuth2Callback() {
   const router = useRouter();
-  const { checkIfGoogleAuthenticated } = useGoogleContext();
+  const { checkIfGoogleAuthenticated } = useGoogleAuthContext();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
 

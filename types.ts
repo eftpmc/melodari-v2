@@ -65,25 +65,25 @@ export interface GooglePlaylist {
 // Define the Spotify-specific playlist type
 export interface SpotifyTrack {
   id: string;
-  name: string;
-  album: {
-    images: {
-      url: string;
-    }[];
+  title: string; // Change 'name' to 'title'
+  artist: string; // Change 'artists' to 'artist'
+  thumbnails: {
+      default: string;
+      medium: string;
+      high: string;
   };
-  artists: {
-    name: string;
-  }[];
 }
 
 export interface SpotifyPlaylist {
   id: string;
-  name: string;
+  title: string;
   description: string;
-  images: {
-    url: string;
-  }[];
-  tracks: SpotifyTrack[];
+  thumbnails: {
+    default: string;
+    medium: string;
+    high: string;
+};
+  songs: SpotifyTrack[];
 }
 
 export interface User {

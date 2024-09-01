@@ -1,24 +1,18 @@
+// GooglePlaylistContext.tsx
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/utils/redux/store';
-import { clearGoogleTokens, setGoogleTokens } from '@/utils/redux/authSlice';
 import { clearGooglePlaylists, UpdateGooglePlaylists, UpdatePlaylistSongs } from '@/utils/redux/playlistSlice';
-import { GooglePlaylist, GoogleSong, Playlist, Song, Tokens } from '@/types';
+import { GooglePlaylist, GoogleSong, Playlist, Song } from '@/types';
 import { googleApi } from '@/utils/google/api';
+import { useGoogleAuthContext } from './GoogleAuthContext';
 
-interface GoogleContextType {
-    isGoogleAuth: boolean;
-    googleUserId: string | null;
-    googleTokens: Tokens | null;
+interface GooglePlaylistContextType {
     playlists: Playlist[];
     fetchSongsForPlaylist: (playlistId: string) => Promise<Song[]>;
     convertPlaylistToGoogle: (playlist: Playlist) => Promise<boolean>;
-    logoutGoogle: () => void;
-    checkIfGoogleAuthenticated: () => Promise<boolean>;
-    refreshGoogleTokens: () => Promise<boolean>;
-    fetchGoogleUserId: () => Promise<string | null>;
     findGooglePlaylist: (title: string) => Promise<GooglePlaylist | null>;
     createGooglePlaylist: (title: string, description?: string) => Promise<GooglePlaylist | null>;
     matchSongsOnGoogle: (songs: Song[]) => Promise<GoogleSong[]>;
@@ -26,129 +20,24 @@ interface GoogleContextType {
     refreshPlaylists: () => Promise<void>;
 }
 
-interface GoogleProviderProps {
+interface GooglePlaylistProviderProps {
     children: React.ReactNode;
 }
 
-export const GoogleContext = createContext<GoogleContextType | null>(null);
+export const GooglePlaylistContext = createContext<GooglePlaylistContextType | null>(null);
 
-export const GoogleProvider = ({ children }: GoogleProviderProps) => {
+export const GooglePlaylistProvider = ({ children }: GooglePlaylistProviderProps) => {
     const dispatch = useDispatch();
-    const googleTokens = useSelector((state: RootState) => state.auth.googleTokens);
     const storedGooglePlaylists = useSelector((state: RootState) => state.playlists.google);
-    const isGoogleAuthenticated = !!googleTokens?.access_token;
+    const { isGoogleAuth, googleTokens } = useGoogleAuthContext();
 
-    const [isGoogleAuth, setIsGoogleAuth] = useState<boolean>(isGoogleAuthenticated);
     const [playlists, setPlaylists] = useState<Playlist[]>([]);
-    const [googleUserId, setGoogleUserId] = useState<string | null>(null);
-
-    useEffect(() => {
-        setIsGoogleAuth(isGoogleAuthenticated);
-    }, [isGoogleAuthenticated]);
 
     useEffect(() => {
         if (isGoogleAuth) {
             loadPlaylists();
         }
     }, [isGoogleAuth]);
-
-    useEffect(() => {
-        if (isGoogleAuth && googleTokens) {
-            fetchGoogleUserId();
-        }
-    }, [isGoogleAuth, googleTokens]);
-
-    const fetchGoogleUserId = async (): Promise<string | null> => {
-        if (googleTokens?.access_token) {
-            try {
-                const userInfo = await googleApi.getCurrentUserProfile(googleTokens.access_token);
-                setGoogleUserId(userInfo.id);
-                return userInfo.id;
-            } catch (error) {
-                console.error('Error fetching Google user ID:', error);
-                return null;
-            }
-        }
-        return null;
-    };
-
-    const handleLogoutGoogle = async () => {
-        dispatch(clearGoogleTokens());
-        dispatch(clearGooglePlaylists());
-
-        if (googleTokens?.access_token) {
-            try {
-                await fetch(`https://accounts.google.com/o/oauth2/revoke?token=${googleTokens.access_token}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                });
-                console.log("Successfully signed out from Google account");
-            } catch (error) {
-                console.error("Error revoking Google token:", error);
-            }
-        }
-
-        setIsGoogleAuth(false);
-    };
-
-    const refreshGoogleTokens = async (): Promise<boolean> => {
-        if (googleTokens?.refresh_token) {
-            try {
-                const newTokens = await googleApi.refreshToken(googleTokens.refresh_token);
-                dispatch(setGoogleTokens(newTokens));
-                return true;
-            } catch (error) {
-                console.error('Error refreshing Google tokens:', error);
-                return false;
-            }
-        }
-        return false;
-    };
-
-    const checkIfGoogleAuthenticated = async (): Promise<boolean> => {
-        if (googleTokens?.access_token) {
-            try {
-                const userInfo = await googleApi.getCurrentUserProfile(googleTokens.access_token);
-                return true;
-            } catch (error) {
-                if (error instanceof Error && error.message.includes('401')) {
-                    const refreshed = await refreshGoogleTokens();
-                    return refreshed;
-                }
-                console.error('Error checking Google authentication:', error);
-                return false;
-            }
-        }
-        return false;
-    };
-
-    const fetchGooglePlaylists = async (): Promise<Playlist[] | null> => {
-        if (googleTokens?.access_token) {
-            try {
-                const data = await googleApi.getUserPlaylists(googleTokens.access_token);
-                const transformedPlaylists: Playlist[] = data.items.map((playlist: any) => ({
-                    id: playlist.id,
-                    title: playlist.snippet.title,
-                    accountName: playlist.snippet.channelTitle,
-                    source: "google",
-                    description: playlist.snippet.description,
-                    thumbnails: {
-                        default: playlist.snippet.thumbnails.default.url,
-                        medium: playlist.snippet.thumbnails.medium.url,
-                        high: playlist.snippet.thumbnails.high.url,
-                    },
-                    songs: [],
-                    platforms: ['google'],
-                }));
-                return transformedPlaylists;
-            } catch (error) {
-                console.error('Error fetching Google playlists:', error);
-            }
-        }
-        return null;
-    };
 
     const validatePlaylists = (playlists: Playlist[]): Playlist[] => {
         const uniquePlaylists: { [id: string]: Playlist } = {};
@@ -197,6 +86,32 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
         }
     };
 
+    const fetchGooglePlaylists = async (): Promise<Playlist[] | null> => {
+        if (googleTokens?.access_token) {
+            try {
+                const data = await googleApi.getUserPlaylists(googleTokens.access_token);
+                const transformedPlaylists: Playlist[] = data.items.map((playlist: any) => ({
+                    id: playlist.id,
+                    title: playlist.snippet.title,
+                    accountName: playlist.snippet.channelTitle,
+                    source: "google",
+                    description: playlist.snippet.description,
+                    thumbnails: {
+                        default: playlist.snippet.thumbnails.default.url,
+                        medium: playlist.snippet.thumbnails.medium.url,
+                        high: playlist.snippet.thumbnails.high.url,
+                    },
+                    songs: [],
+                    platforms: ['google'],
+                }));
+                return transformedPlaylists;
+            } catch (error) {
+                console.error('Error fetching Google playlists:', error);
+            }
+        }
+        return null;
+    };
+
     const fetchSongsForPlaylist = async (playlistId: string): Promise<Song[]> => {
         const playlist = playlists.find(p => p.id === playlistId);
         if (!playlist || playlist.songs.length > 0) {
@@ -216,6 +131,7 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
                         high: item.snippet.thumbnails.high.url,
                     },
                 }));
+
                 dispatch(UpdatePlaylistSongs({ playlistId, songs: fetchedSongs }));
 
                 setPlaylists(prevPlaylists => prevPlaylists.map(p =>
@@ -305,20 +221,20 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
 
     const matchSongsOnGoogle = async (songs: Song[]): Promise<GoogleSong[]> => {
         const matchedSongs: GoogleSong[] = [];
-
+    
         for (const song of songs) {
             const matchedSong = await searchSongOnGoogle(song.title, song.artist);
             if (matchedSong) {
                 matchedSongs.push(matchedSong);
             }
         }
-
+    
         return matchedSongs;
     };
-
+    
     const addSongsToGooglePlaylist = async (playlistId: string, songs: GoogleSong[]) => {
         if (!googleTokens?.access_token) return;
-
+    
         try {
             for (const song of songs) {
                 await googleApi.addVideoToPlaylist(googleTokens.access_token, playlistId, song.id);
@@ -327,10 +243,10 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
             console.error('Error adding songs to Google playlist:', error);
         }
     };
-
+    
     const searchSongOnGoogle = async (title: string, artist?: string): Promise<GoogleSong | null> => {
         if (!googleTokens?.access_token) return null;
-
+    
         try {
             const query = artist ? `${title} ${artist}` : title;
             const data = await googleApi.searchVideos(googleTokens.access_token, query);
@@ -350,23 +266,16 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
         } catch (error) {
             console.error('Error searching for song on Google:', error);
         }
-
+    
         return null;
     };
-
+    
     return (
-        <GoogleContext.Provider
+        <GooglePlaylistContext.Provider
             value={{
-                isGoogleAuth,
-                googleUserId,
-                googleTokens,
                 playlists,
                 fetchSongsForPlaylist,
                 convertPlaylistToGoogle,
-                logoutGoogle: handleLogoutGoogle,
-                checkIfGoogleAuthenticated,
-                refreshGoogleTokens,
-                fetchGoogleUserId,
                 findGooglePlaylist,
                 createGooglePlaylist,
                 matchSongsOnGoogle,
@@ -375,8 +284,8 @@ export const GoogleProvider = ({ children }: GoogleProviderProps) => {
             }}
         >
             {children}
-        </GoogleContext.Provider>
+        </GooglePlaylistContext.Provider>
     );
-};
-
-export const useGoogleContext = () => useContext(GoogleContext) as GoogleContextType;
+    };
+    
+    export const useGooglePlaylistContext = () => useContext(GooglePlaylistContext) as GooglePlaylistContextType;

@@ -2,8 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { useProfile } from '@/contexts/ProfileContext';
 import PlaylistCard from './PlaylistCard';
 import PlaylistModal from './PlaylistModal';
-import { useGoogleContext } from '@/contexts/GoogleContext';
-import { useSpotifyContext } from '@/contexts/SpotifyContext';
+import { useGooglePlaylistContext } from '@/contexts/google/GooglePlaylistContext';
+import { useSpotifyPlaylistContext } from '@/contexts/spotify/SpotifyPlaylistContext';
 import { Playlist } from '@/types';
 
 export default function FilterablePlaylist() {
@@ -13,8 +13,8 @@ export default function FilterablePlaylist() {
   const [playCounts, setPlayCounts] = useState<{ [id: string]: number }>({});
 
   const { getPlayCount, incrementPlayCount } = useProfile();
-  const { playlists: googlePlaylists, refreshPlaylists: refreshGooglePlaylists } = useGoogleContext();
-  const { playlists: spotifyPlaylists, refreshPlaylists: refreshSpotifyPlaylists } = useSpotifyContext();
+  const { playlists: googlePlaylists, refreshPlaylists: refreshGooglePlaylists } = useGooglePlaylistContext();
+  const { playlists: spotifyPlaylists, refreshPlaylists: refreshSpotifyPlaylists } = useSpotifyPlaylistContext();
 
   useEffect(() => {
     const timeout = setTimeout(() => {

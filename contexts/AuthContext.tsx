@@ -1,8 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useGoogleContext } from './GoogleContext';
-import { useSpotifyContext } from './SpotifyContext';
+import { useGoogleAuthContext } from './google/GoogleAuthContext';
+import { useSpotifyAuthContext } from './spotify/SpotifyAuthContext';
 import { logout as reduxLogout } from '@/utils/redux/authSlice';
 import { useDispatch } from 'react-redux';
 
@@ -15,8 +15,8 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { isGoogleAuth, fetchGoogleUserId, logoutGoogle } = useGoogleContext();
-    const { isSpotifyAuth, logoutSpotify } = useSpotifyContext();
+    const { isGoogleAuth, fetchGoogleUserId, logoutGoogle } = useGoogleAuthContext();
+    const { isSpotifyAuth, logoutSpotify } = useSpotifyAuthContext();
     const dispatch = useDispatch();
 
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(isGoogleAuth || isSpotifyAuth);

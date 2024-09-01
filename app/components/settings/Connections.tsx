@@ -1,16 +1,16 @@
 "use client";
 
 import React from 'react';
-import { useSpotifyContext } from '@/contexts/SpotifyContext';
-import { useGoogleContext } from '@/contexts/GoogleContext';
+import { useSpotifyAuthContext } from '@/contexts/spotify/SpotifyAuthContext';
+import { useGoogleAuthContext } from '@/contexts/google/GoogleAuthContext';
 import { FaSpotify, FaGoogle } from 'react-icons/fa';
 import ConnectionCard from './ConnectionCard';
 
 const Connections: React.FC<{
   onDisconnectClick: (account: "google" | "spotify") => void;
 }> = ({ onDisconnectClick }) => {
-  const { isGoogleAuth, checkIfGoogleAuthenticated, logoutGoogle } = useGoogleContext();
-  const { isSpotifyAuth, checkIfSpotifyAuthenticated, logoutSpotify } = useSpotifyContext();
+  const { isGoogleAuth, checkIfGoogleAuthenticated, logoutGoogle } = useGoogleAuthContext();
+  const { isSpotifyAuth, checkIfSpotifyAuthenticated, logoutSpotify } = useSpotifyAuthContext();
 
   const [loadingGoogle, setLoadingGoogle] = React.useState(false);
   const [loadingSpotify, setLoadingSpotify] = React.useState(false);
