@@ -199,9 +199,10 @@ export const SpotifyPlaylistProvider = ({ children }: SpotifyPlaylistProviderPro
 
     const createSpotifyPlaylist = async (title: string, description?: string): Promise<SpotifyPlaylist | null> => {
         if (!spotifyTokens?.access_token) return null;
+        if (!supabaseUserId) return null;
 
         try {
-            const playlist = await spotifyApi.createPlaylist(spotifyTokens.access_token, title, description || "");
+            const playlist = await spotifyApi.createPlaylist(spotifyTokens.access_token, title, description || "", supabaseUserId);
             return {
                 id: playlist.id,
                 title: playlist.name,
