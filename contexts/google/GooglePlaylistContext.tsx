@@ -26,8 +26,8 @@ interface GooglePlaylistProviderProps {
 export const GooglePlaylistContext = createContext<GooglePlaylistContextType | null>(null);
 
 export const GooglePlaylistProvider = ({ children }: GooglePlaylistProviderProps) => {
-    const { isGoogleAuth, googleTokens } = useGoogleAuthContext();
-    const { googlePlaylists, updateGooglePlaylists, supabaseUserId } = useProfile();
+    const { isGoogleAuth, googleTokens, googleUserId } = useGoogleAuthContext();
+    const { googlePlaylists, updateGooglePlaylists, supabaseUserId, fetchUserProfile } = useProfile();
 
     const [playlists, setPlaylists] = useState<Playlist[]>([]);
 
@@ -112,9 +112,10 @@ export const GooglePlaylistProvider = ({ children }: GooglePlaylistProviderProps
     };
 
     const fetchSongsForPlaylist = async (playlistId: string): Promise<Song[]> => {
-        const playlist = playlists.find(p => p.id === playlistId);
-        if (!playlist || playlist.songs.length > 0) {
-            return playlist?.songs || [];
+        const playlist = googlePlaylists.find((p: { id: string; }) => p.id === playlistId);
+
+        if (playlist && playlist.songs.length > 0) {
+            return playlist.songs;
         }
 
         if (googleTokens?.access_token) {

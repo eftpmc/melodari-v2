@@ -63,7 +63,7 @@ export const supabaseOperations = {
   },
 
   updateGooglePlaylistSongs: async (userId: string, playlistId: string, newSongs: any) => {
-  const { data: userProfile, error: fetchError } = await supabase
+    const { data: userProfile, error: fetchError } = await supabase
       .from('profiles')
       .select('google_playlists')
       .eq('id', userId)
@@ -74,9 +74,17 @@ export const supabaseOperations = {
     }
   
     const googlePlaylists = userProfile.google_playlists || {};
-    const playlist = googlePlaylists[playlistId] || {};
-    playlist.songs = newSongs;
-    googlePlaylists[playlistId] = playlist;
+
+    const playlistIndex = googlePlaylists.findIndex((playlist: any) => playlist.id === playlistId);
+
+    if (playlistIndex !== -1) {
+        googlePlaylists[playlistIndex].songs = newSongs;
+    } else {
+        googlePlaylists.push({
+            id: playlistId,
+            songs: newSongs,
+        });
+    }
   
     const { data, error: updateError } = await supabase
       .from('profiles')
@@ -107,14 +115,22 @@ export const supabaseOperations = {
     }
   
     const spotifyPlaylists = userProfile.spotify_playlists || {};
-    const playlist = spotifyPlaylists[playlistId] || {};
-    playlist.songs = newSongs;
-    spotifyPlaylists[playlistId] = playlist;
+  
+    const playlistIndex = spotifyPlaylists.findIndex((playlist: any) => playlist.id === playlistId);
+
+    if (playlistIndex !== -1) {
+        spotifyPlaylists[playlistIndex].songs = newSongs;
+    } else {
+        spotifyPlaylists.push({
+            id: playlistId,
+            songs: newSongs,
+        });
+    }
   
     const { data, error: updateError } = await supabase
       .from('profiles')
       .update({
-        google_playlists: spotifyPlaylists,
+        spotify_playlists: spotifyPlaylists,
         updated_at: new Date(),
       })
       .eq('id', userId)

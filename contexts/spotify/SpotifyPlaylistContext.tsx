@@ -112,9 +112,10 @@ export const SpotifyPlaylistProvider = ({ children }: SpotifyPlaylistProviderPro
     };
 
     const fetchSongsForPlaylist = async (playlistId: string): Promise<Song[]> => {
-        const playlist = playlists.find(p => p.id === playlistId);
-        if (!playlist || playlist.songs.length > 0) {
-            return playlist?.songs || [];
+        const playlist = spotifyPlaylists.find((p: { id: string; }) => p.id === playlistId);
+        
+        if (playlist && playlist.songs.length > 0) {
+            return playlist.songs;
         }
 
         if (spotifyTokens?.access_token) {

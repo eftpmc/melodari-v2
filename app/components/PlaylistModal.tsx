@@ -23,7 +23,7 @@ const platformsData = [
 
 const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
   const { fetchSongsForPlaylist: fetchGoogleSongs, findGooglePlaylist, createGooglePlaylist, matchSongsOnGoogle, addSongsToGooglePlaylist, refreshPlaylists: refreshGooglePlaylists } = useGooglePlaylistContext();
-  const { findSpotifyPlaylist, createSpotifyPlaylist, matchSongsOnSpotify, addSongsToSpotifyPlaylist, refreshPlaylists: refreshSpotifyPlaylists, fetchSongsForPlaylist: fetchSpotifySongs } = useSpotifyPlaylistContext();
+  const { fetchSongsForPlaylist: fetchSpotifySongs, findSpotifyPlaylist, createSpotifyPlaylist, matchSongsOnSpotify, addSongsToSpotifyPlaylist, refreshPlaylists: refreshSpotifyPlaylists } = useSpotifyPlaylistContext();
   const [loading, setLoading] = useState(true);
   const [songs, setSongs] = useState<Song[]>([]);
   const [openSongIndex, setOpenSongIndex] = useState<number | null>(null);

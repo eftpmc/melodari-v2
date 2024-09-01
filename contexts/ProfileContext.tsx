@@ -50,6 +50,8 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
         try {
             let data = await supabaseOperations.getUserProfile(googleUserId);
 
+            console.log(data)
+
             if (!data) {
                 data = await supabaseOperations.createUserProfile(googleUserId);
             }
