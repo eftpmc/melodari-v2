@@ -202,7 +202,7 @@ export const SpotifyPlaylistProvider = ({ children }: SpotifyPlaylistProviderPro
         if (!supabaseUserId) return null;
 
         try {
-            const playlist = await spotifyApi.createPlaylist(spotifyTokens.access_token, title, description || "", supabaseUserId);
+            const playlist = await spotifyApi.createPlaylist(spotifyTokens.access_token, supabaseUserId, title, description || "");
             return {
                 id: playlist.id,
                 title: playlist.name,
