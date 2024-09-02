@@ -9,7 +9,7 @@ import FriendCard from '@/app/components/friends/FriendCard';
 import { FaSpotify } from 'react-icons/fa';
 import { SiYoutubemusic } from 'react-icons/si';
 
-export const platformsData = [
+const platformsData = [
   { id: 'google', name: 'YouTube Music', icon: <SiYoutubemusic className="text-red-600 w-6 h-6" /> },
   { id: 'spotify', name: 'Spotify', icon: <FaSpotify className="text-green-600 w-6 h-6" /> },
 ];
