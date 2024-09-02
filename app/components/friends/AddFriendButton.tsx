@@ -3,7 +3,11 @@
 import React, { useState } from 'react';
 import { useFriendContext } from '@/contexts/FriendContext';
 
-const AddFriendButton: React.FC = () => {
+interface AddFriendButtonProps {
+    children: React.ReactNode;
+}
+
+const AddFriendButton: React.FC<AddFriendButtonProps> = ({ children }) => {
     const [showAddFriendModal, setShowAddFriendModal] = useState(false);
     const [searchUsername, setSearchUsername] = useState('');
     const [warning, setWarning] = useState<string | null>(null);
@@ -23,9 +27,9 @@ const AddFriendButton: React.FC = () => {
 
     return (
         <>
-            <button className="btn btn-primary text-base-100" onClick={() => setShowAddFriendModal(true)}>
-                Add Friend
-            </button>
+            <div onClick={() => setShowAddFriendModal(true)}>
+                {children}
+            </div>
             {showAddFriendModal && (
                 <div className="modal modal-open">
                     <div className="modal-box">

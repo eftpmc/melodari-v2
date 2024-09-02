@@ -33,6 +33,20 @@ export const supabaseOperations = {
     return data;
   },
 
+  getUserProfileByUsername: async (username: string) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, avatar_url, username, platforms, google_playlists, spotify_playlists')
+      .eq('username', username)
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  },
+
   updateGooglePlaylists: async (userId: string, newGooglePlaylists: any) => {
     const { data: userProfile, error: fetchError } = await supabase
       .from('profiles')

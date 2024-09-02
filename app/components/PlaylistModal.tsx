@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { Playlist, Song } from '@/types';
 import { useGooglePlaylistContext } from '@/contexts/google/GooglePlaylistContext';
 import { useSpotifyPlaylistContext } from '@/contexts/spotify/SpotifyPlaylistContext';
+import { useGoogleAuthContext } from '@/contexts/google/GoogleAuthContext';
+import { useSpotifyAuthContext } from '@/contexts/spotify/SpotifyAuthContext';
 import SongItem from './SongItem';
 import { FaSpotify } from 'react-icons/fa';
 import { SiYoutubemusic } from 'react-icons/si';
@@ -24,6 +26,8 @@ const platformsData = [
 const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
   const { fetchSongsForPlaylist: fetchGoogleSongs, findGooglePlaylist, createGooglePlaylist, matchSongsOnGoogle, addSongsToGooglePlaylist, refreshPlaylists: refreshGooglePlaylists } = useGooglePlaylistContext();
   const { fetchSongsForPlaylist: fetchSpotifySongs, findSpotifyPlaylist, createSpotifyPlaylist, matchSongsOnSpotify, addSongsToSpotifyPlaylist, refreshPlaylists: refreshSpotifyPlaylists } = useSpotifyPlaylistContext();
+  const { isGoogleAuth } = useGoogleAuthContext();
+  const { isSpotifyAuth } = useSpotifyAuthContext();
   const [loading, setLoading] = useState(true);
   const [songs, setSongs] = useState<Song[]>([]);
   const [openSongIndex, setOpenSongIndex] = useState<number | null>(null);
@@ -101,7 +105,9 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
   };
 
   const availablePlatforms = platformsData.filter(
-    (platform) => !playlist.platforms.includes(platform.id)
+    (platform) => !playlist.platforms.includes(platform.id) && 
+                  ((platform.id === 'google' && isGoogleAuth) || 
+                   (platform.id === 'spotify' && isSpotifyAuth))
   );
 
   if (!playlist) return null;
