@@ -94,12 +94,15 @@ export const SpotifyAuthProvider = ({ children }: SpotifyAuthProviderProps) => {
     const checkIfSpotifyAuthenticated = async (): Promise<boolean> => {
         if (spotifyTokens?.access_token) {
             try {
-                const userInfo = await spotifyApi.getCurrentUserProfile(spotifyTokens.access_token);
+                await spotifyApi.getCurrentUserProfile(spotifyTokens.access_token);
                 return true;
             } catch (error) {
                 if (error instanceof Error && error.message.includes('401')) {
+                    console.log('Access token expired, attempting to refresh...');
                     const refreshed = await refreshSpotifyTokens();
-                    return refreshed;
+                    if (refreshed) {
+                        return await checkIfSpotifyAuthenticated(); // Retry after refreshing tokens
+                    }
                 }
                 console.error('Error checking Spotify authentication:', error);
                 return false;

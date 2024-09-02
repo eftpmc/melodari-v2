@@ -92,12 +92,15 @@ export const GoogleAuthProvider = ({ children }: GoogleAuthProviderProps) => {
     const checkIfGoogleAuthenticated = async (): Promise<boolean> => {
         if (googleTokens?.access_token) {
             try {
-                const userInfo = await googleApi.getCurrentUserProfile(googleTokens.access_token);
+                await googleApi.getCurrentUserProfile(googleTokens.access_token);
                 return true;
             } catch (error) {
                 if (error instanceof Error && error.message.includes('401')) {
+                    console.log('Access token expired, attempting to refresh...');
                     const refreshed = await refreshGoogleTokens();
-                    return refreshed;
+                    if (refreshed) {
+                        return await checkIfGoogleAuthenticated(); // Retry after refreshing tokens
+                    }
                 }
                 console.error('Error checking Google authentication:', error);
                 return false;
