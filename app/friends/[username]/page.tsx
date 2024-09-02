@@ -123,7 +123,7 @@ const FriendPage: React.FC = () => {
           ) : (
             <div className="bg-base-100 rounded-lg p-4 text-center">
               <p className="text-base-content">No playlists found.</p>
-              <p className="text-sm text-base-content mt-2">This user hasn't created any playlists yet.</p>
+              <p className="text-sm text-base-content mt-2">This user hasn&apos;t created any playlists yet.</p>
             </div>
           )}
         </div>
