@@ -140,7 +140,7 @@ const FriendPage: React.FC = () => {
           ) : (
             <div className="bg-base-100 rounded-lg p-4 text-center">
               <p className="text-base-content">No friends found.</p>
-              <p className="text-sm text-base-content mt-2">This user hasn't added any friends yet.</p>
+              <p className="text-sm text-base-content mt-2">This user hasn&apos;t added any friends yet.</p>
             </div>
           )}
         </div>
