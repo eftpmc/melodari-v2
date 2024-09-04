@@ -41,12 +41,12 @@ const AddFriendButton: React.FC<AddFriendButtonProps> = ({ children }) => {
                             <input
                                 type="text"
                                 placeholder="Friend's username"
-                                className="input w-[83%] border-none text-base-content focus:outline-none px-4"
+                                className="input flex-1 border-none text-base-content focus:outline-none px-4"
                                 value={searchUsername}
                                 onChange={(e) => setSearchUsername(e.target.value)}
                             />
                             <button
-                                className="bg-base-content hover:bg-primary text-base-100 px-6 py-2 rounded-full flex items-center justify-center group"
+                                className="bg-base-content hover:bg-primary text-base-100 px-6 py-2 mr-2 rounded-full flex items-center justify-center group"
                                 onClick={handleSendRequest}
                                 disabled={isLoading}
                             >
