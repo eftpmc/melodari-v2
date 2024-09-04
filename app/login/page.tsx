@@ -69,6 +69,10 @@ export default function Login() {
                     Melodari uses one playlist that can be connected to all of our supported providers.
                 </p>
             </div>
+
+            <div className="relative w-full background">
+                Hello
+            </div>
         </div>
     );
 }

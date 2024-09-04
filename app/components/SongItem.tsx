@@ -24,8 +24,6 @@ const SongItem: React.FC<SongItemProps> = ({ song, index, isOpen, onClick }) => 
               {song.artist}
             </span>
           </div>
-
-          <BsThreeDotsVertical className="text-base-content opacity-60 hover:text-opacity-100 cursor-pointer" />
         </div>
         </div>
 

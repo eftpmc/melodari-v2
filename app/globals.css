@@ -179,3 +179,11 @@ body {
   font-weight: 200;
   font-style: italic;
 }
+
+.background {
+  background-image: url('/bg2.svg');
+  background-size: cover; 
+  background-position: bottom center;
+  background-repeat: no-repeat;
+  min-height: 200vh;
+}

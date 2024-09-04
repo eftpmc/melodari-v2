@@ -62,7 +62,6 @@ const DemoModal = () => {
                   </span>
                 </div>
               </div>
-              <BsThreeDotsVertical className="text-base-content opacity-60 hover:text-opacity-100 cursor-pointer" />
             </li>
           ))}
         </ul>
