@@ -52,6 +52,130 @@ body {
   font-display: swap;
 }
 
-body {
-  font-family: 'Helvetica', sans-serif;
+/* Bw Modelica LGC Black */
+@font-face {
+  font-family: 'Bw Modelica';
+  src: url('/fonts/BwModelica/Bw Modelica LGC Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+}
+
+/* Bw Modelica LGC Black Italic */
+@font-face {
+  font-family: 'Bw Modelica';
+  src: url('/fonts/BwModelica/Bw Modelica LGC Black Italic.ttf') format('truetype');
+  font-weight: 900;
+  font-style: italic;
+}
+
+/* Bw Modelica LGC Bold */
+@font-face {
+  font-family: 'Bw Modelica';
+  src: url('/fonts/BwModelica/Bw Modelica LGC Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* Bw Modelica LGC Bold Italic */
+@font-face {
+  font-family: 'Bw Modelica';
+  src: url('/fonts/BwModelica/Bw Modelica LGC Bold Italic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+}
+
+/* Bw Modelica LGC ExtraBold */
+@font-face {
+  font-family: 'Bw Modelica';
+  src: url('/fonts/BwModelica/Bw Modelica LGC ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}
+
+/* Bw Modelica LGC ExtraBold Italic */
+@font-face {
+  font-family: 'Bw Modelica';
+  src: url('/fonts/BwModelica/Bw Modelica LGC ExtraBold Italic.ttf') format('truetype');
+  font-weight: 800;
+  font-style: italic;
+}
+
+/* Bw Modelica LGC Hairline */
+@font-face {
+  font-family: 'Bw Modelica';
+  src: url('/fonts/BwModelica/Bw Modelica LGC Hairline.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+}
+
+/* Bw Modelica LGC Hairline Italic */
+@font-face {
+  font-family: 'Bw Modelica';
+  src: url('/fonts/BwModelica/Bw Modelica LGC Hairline Italic.ttf') format('truetype');
+  font-weight: 100;
+  font-style: italic;
+}
+
+/* Bw Modelica LGC Light */
+@font-face {
+  font-family: 'Bw Modelica';
+  src: url('/fonts/BwModelica/Bw Modelica LGC Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+/* Bw Modelica LGC Light Italic */
+@font-face {
+  font-family: 'Bw Modelica';
+  src: url('/fonts/BwModelica/Bw Modelica LGC Light Italic.ttf') format('truetype');
+  font-weight: 300;
+  font-style: italic;
+}
+
+/* Bw Modelica LGC Medium */
+@font-face {
+  font-family: 'Bw Modelica';
+  src: url('/fonts/BwModelica/Bw Modelica LGC Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* Bw Modelica LGC Medium Italic */
+@font-face {
+  font-family: 'Bw Modelica';
+  src: url('/fonts/BwModelica/Bw Modelica LGC Medium Italic.ttf') format('truetype');
+  font-weight: 500;
+  font-style: italic;
+}
+
+/* Bw Modelica LGC Regular */
+@font-face {
+  font-family: 'Bw Modelica';
+  src: url('/fonts/BwModelica/Bw Modelica LGC Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Bw Modelica LGC Regular Italic */
+@font-face {
+  font-family: 'Bw Modelica';
+  src: url('/fonts/BwModelica/Bw Modelica LGC Regular Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* Bw Modelica LGC Thin */
+@font-face {
+  font-family: 'Bw Modelica';
+  src: url('/fonts/BwModelica/Bw Modelica LGC Thin.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+}
+
+/* Bw Modelica LGC Thin Italic */
+@font-face {
+  font-family: 'Bw Modelica';
+  src: url('/fonts/BwModelica/Bw Modelica LGC Thin Italic.ttf') format('truetype');
+  font-weight: 200;
+  font-style: italic;
 }

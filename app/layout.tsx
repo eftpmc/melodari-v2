@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en font-modelica">
       <ClientProvider>
         <body className={`min-h-screen flex flex-col overflow-x-hidden`}>
           <header

@@ -9,6 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
+        modelica: ['Bw Modelica', 'sans-serif'],
         helvetica: ['Helvetica', 'sans-serif'],
       },
       backgroundImage: {

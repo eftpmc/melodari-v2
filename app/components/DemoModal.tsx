@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { FaSpotify } from 'react-icons/fa';
 import { SiYoutubemusic } from 'react-icons/si';
 import { BsThreeDotsVertical } from 'react-icons/bs';
-import { FiPlay } from 'react-icons/fi';
 
 const DemoModal = () => {
   const [songs] = useState([
@@ -15,7 +14,7 @@ const DemoModal = () => {
 
   const playlist = {
     title: "dred",
-    accountName: "eftpmc",
+    accountName: "ari",
     imageUrl: "/grunge.gif", // Use a valid image path for your playlist
   };
 
@@ -54,11 +53,11 @@ const DemoModal = () => {
             <li key={song.id} className="flex items-center justify-between py-2 text-base-content">
               <div className="flex items-center w-full">
                 <span className="mr-4 text-base-content font-semibold opacity-70">{index + 1}.</span>
-                <div className="flex-1 flex flex-wrap truncate">
-                  <span className="block font-semibold text-base-content truncate w-1/2">
+                <div className="inline-flex items-center truncate w-full">
+                  <span className="font-semibold text-base-content truncate">
                     {song.title}
                   </span>
-                  <span className="ml-2 text-sm text-base-content opacity-60 truncate w-1/2">
+                  <span className="ml-2 text-sm text-base-content opacity-60">
                     by {song.artist}
                   </span>
                 </div>
