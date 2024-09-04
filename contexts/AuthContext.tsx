@@ -7,60 +7,88 @@ import { logout as reduxLogout } from '@/utils/redux/authSlice';
 import { useDispatch } from 'react-redux';
 
 interface AuthContextType {
-    isAuthenticated: boolean;
-    googleUserId: string | null;
-    logout: () => void;
+  isAuthenticated: boolean;
+  googleUserId: string | null;
+  logout: () => void;
+  loading: boolean;
+  getAuthorizeUrl: (service: 'google' | 'spotify') => Promise<string | null>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { isGoogleAuth, fetchGoogleUserId, logoutGoogle } = useGoogleAuthContext();
-    const { isSpotifyAuth, logoutSpotify } = useSpotifyAuthContext();
-    const dispatch = useDispatch();
+  const { isGoogleAuth, fetchGoogleUserId, logoutGoogle } = useGoogleAuthContext();
+  const { isSpotifyAuth, logoutSpotify } = useSpotifyAuthContext();
+  const dispatch = useDispatch();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [googleUserId, setGoogleUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(isGoogleAuth || isSpotifyAuth);
-    const [googleUserId, setGoogleUserId] = useState<string | null>(null);
+  useEffect(() => {
+    setIsAuthenticated(isGoogleAuth || isSpotifyAuth);
+    setLoading(false);
+  }, [isGoogleAuth, isSpotifyAuth]);
 
-    useEffect(() => {
-        setIsAuthenticated(isGoogleAuth || isSpotifyAuth);
-    }, [isGoogleAuth, isSpotifyAuth]);
+  useEffect(() => {
+    if (isGoogleAuth) {
+      fetchAndSetGoogleUserId();
+    }
+  }, [isGoogleAuth]);
 
-    useEffect(() => {
-        if (isGoogleAuth) {
-            fetchAndSetGoogleUserId();
-        }
-    }, [isGoogleAuth]);
+  const fetchAndSetGoogleUserId = async () => {
+    const userId = await fetchGoogleUserId();
+    setGoogleUserId(userId);
+  };
 
-    const fetchAndSetGoogleUserId = async () => {
-        const userId = await fetchGoogleUserId();
-        setGoogleUserId(userId);
-    };
+  const handleLogout = () => {
+    logoutSpotify();
+    logoutGoogle();
+    dispatch(reduxLogout());
+    setGoogleUserId(null);
+  };
 
-    const handleLogout = () => {
-        logoutSpotify();
-        logoutGoogle();
-        dispatch(reduxLogout());
-        setGoogleUserId(null);
-    };
+  const getAuthorizeUrl = async (service: 'google' | 'spotify'): Promise<string | null> => {
+    try {
+      const res = await fetch(`/api/auth/${service}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    return (
-        <AuthContext.Provider
-            value={{
-                isAuthenticated,
-                googleUserId,
-                logout: handleLogout,
-            }}
-        >
-            {children}
-        </AuthContext.Provider>
-    );
+      const data = await res.json();
+      return data.authorizeUrl || null;
+    } catch (error) {
+      console.error(`Error getting ${service} authorize URL:`, error);
+      return null;
+    }
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        googleUserId,
+        logout: handleLogout,
+        loading,
+        getAuthorizeUrl,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
-    return context;
+  const context = useContext(AuthContext);
+  if (!context) {
+    return {
+      isAuthenticated: false,
+      googleUserId: null,
+      logout: () => {},
+      loading: true,
+      getAuthorizeUrl: async () => null,
+    };
+  }
+  return context;
 };

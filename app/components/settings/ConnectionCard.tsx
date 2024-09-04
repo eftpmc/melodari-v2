@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { LucideX, LucidePlugZap, LucideRefreshCw } from 'lucide-react';
 
 interface ConnectionCardProps {
   icon: React.ReactNode;
@@ -33,29 +34,58 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({
     }
   };
 
+  const renderButtonContent = () => {
+    if (loading) {
+      return "Connecting...";
+    }
+    
+    if (status === "Re-authentication required") {
+      return (
+        <div className="flex items-center space-x-2">
+          <span>Refresh</span>
+          <LucideRefreshCw className="w-4 h-4 group-hover:animate-spin" />
+        </div>
+      );
+    }
+
+    if (isConnected) {
+      return (
+        <div className="flex items-center space-x-2">
+          <span>Disconnect</span>
+          <LucideX className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex items-center space-x-2">
+        <span>Connect</span>
+        <LucidePlugZap className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
+      </div>
+    );
+  };
+
   return (
     <div className="flex items-center p-4 bg-base-100 rounded-lg shadow">
       {icon}
       <div className="flex-1">
         <h3 className="text-lg font-semibold text-base-content">{accountName}</h3>
         <p className="text-sm text-gray-500">
-          {isConnected
-            ? status
-            : "Not Connected"}
+          {isConnected ? status : "Not Connected"}
         </p>
       </div>
       <button
         onClick={handleButtonClick}
-        className={`btn btn-sm text-base-100 ${status === "Re-authentication required" ? "btn-warning" : isConnected ? "btn-error" : "btn-success"}`}
+        className={`btn btn-sm text-base-100 flex items-center group ${
+          status === "Re-authentication required"
+            ? "btn-warning"
+            : isConnected
+            ? "btn-error"
+            : "btn-success"
+        }`}
         disabled={loading}
       >
-        {loading
-          ? "Connecting..."
-          : status === "Re-authentication required"
-            ? "Refresh"
-            : isConnected
-              ? "Disconnect"
-              : "Connect"}
+        {renderButtonContent()}
       </button>
     </div>
   );

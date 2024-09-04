@@ -1,6 +1,7 @@
-"use client"
+"use client";
 
 import React, { useState } from 'react';
+import { Send, LucideLoader2, LucideX } from 'lucide-react';
 import { useFriendContext } from '@/contexts/FriendContext';
 
 interface AddFriendButtonProps {
@@ -35,19 +36,40 @@ const AddFriendButton: React.FC<AddFriendButtonProps> = ({ children }) => {
                     <div className="modal-box">
                         <h3 className="font-bold text-lg text-base-content">Add a Friend</h3>
                         <p className="py-4 text-base-content">Enter your friend&apos;s username to add them.</p>
-                        <input
-                            type="text"
-                            placeholder="Friend's username"
-                            className="input input-bordered w-full mb-4 text-base-content"
-                            value={searchUsername}
-                            onChange={(e) => setSearchUsername(e.target.value)}
-                        />
-                        {warning && <p className="text-red-600 mb-4">{warning}</p>}
-                        <button className="btn btn-primary text-base-100 w-full" onClick={handleSendRequest} disabled={isLoading}>
-                            {isLoading ? 'Sending...' : 'Send Request'}
-                        </button>
+                        
+                        <div className="flex items-center border border-base-300 rounded-full overflow-hidden">
+                            <input
+                                type="text"
+                                placeholder="Friend's username"
+                                className="input w-[83%] border-none text-base-content focus:outline-none px-4"
+                                value={searchUsername}
+                                onChange={(e) => setSearchUsername(e.target.value)}
+                            />
+                            <button
+                                className="bg-base-content hover:bg-primary text-base-100 px-6 py-2 rounded-full flex items-center justify-center group"
+                                onClick={handleSendRequest}
+                                disabled={isLoading}
+                            >
+                                {isLoading ? (
+                                    <LucideLoader2 className="animate-spin w-5 h-5" />
+                                ) : (
+                                    <Send className="w-5 h-5 transform transition-transform duration-300 group-hover:rotate-12" />
+                                )}
+                            </button>
+                        </div>
+
+                        {warning && <p className="text-red-600 mt-4">{warning}</p>}
+
                         <div className="modal-action">
-                            <button className="btn" onClick={() => setShowAddFriendModal(false)}>Close</button>
+                            <button
+                                className="btn flex items-center space-x-2 group"
+                                onClick={() => setShowAddFriendModal(false)}
+                            >
+                                <LucideX
+                                    className="w-4 h-4 transform transition-transform duration-300 group-hover:rotate-90 group-hover:scale-110"
+                                />
+                                <span>Close</span>
+                            </button>
                         </div>
                     </div>
                 </div>

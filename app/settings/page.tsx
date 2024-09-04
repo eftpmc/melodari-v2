@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import ConfirmDialog from '@/app/components/ConfirmDialog';
 import ProfileSettings from '@/app/components/settings/ProfileSettings';
 import Connections from '@/app/components/settings/Connections';
+import { X } from 'lucide-react';
 
 const SettingsPage: React.FC = () => {
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -42,6 +43,7 @@ const SettingsPage: React.FC = () => {
                 onConfirm={handleConfirmDisconnect}
                 onCancel={() => setShowConfirmDialog(false)}
                 confirmButtonText="Disconnect"
+                Icon={X}
             />
         </div>
     );

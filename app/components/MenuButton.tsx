@@ -4,7 +4,7 @@ import { Menu, LogOut, Settings, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from '@/contexts/AuthContext';
 import React, { useState } from 'react';
-import ConfirmDialog from './ConfirmDialog'; // Adjust the import path based on your project structure
+import ConfirmDialog from './ConfirmDialog';
 
 const MenuButton = () => {
   const router = useRouter();
@@ -34,22 +34,23 @@ const MenuButton = () => {
 
   return (
     <div className="dropdown dropdown-end">
-      <label tabIndex={0} className="btn btn-square bg-base-100 hover:bg-primary hover:text-base-100">
+      <label tabIndex={0} className="btn bg-base-content hover:bg-primary text-base-200 rounded-full">
         <Menu className="w-6 h-6" />
+        Menu
       </label>
-      <ul tabIndex={0} className="dropdown-content bg-base-100 menu p-2 m-2 shadow rounded-box w-52">
+      <ul tabIndex={0} className="dropdown-content bg-base-content text-base-200 menu p-2 m-2 shadow rounded-box w-52">
         <li>
-          <a onClick={handleFriends} className="flex items-center">
+          <a onClick={handleFriends} className="flex items-center hover:bg-primary">
             <Users className="w-4 h-4 mr-2" /> Friends
           </a>
         </li>
         <li>
-          <a onClick={handleSettings} className="flex items-center">
+          <a onClick={handleSettings} className="flex items-center hover:bg-primary">
             <Settings className="w-4 h-4 mr-2" /> Settings
           </a>
         </li>
         <li>
-          <a onClick={handleSignOut} className="flex items-center">
+          <a onClick={handleSignOut} className="flex items-center hover:bg-primary">
             <LogOut className="w-4 h-4 mr-2" /> Sign Out
           </a>
         </li>
@@ -63,6 +64,7 @@ const MenuButton = () => {
         onConfirm={confirmSignOut}
         onCancel={cancelSignOut}
         confirmButtonText="Sign Out"
+        Icon={LogOut}
       />
     </div>
   );

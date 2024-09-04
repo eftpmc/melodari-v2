@@ -24,13 +24,16 @@ const FriendList: React.FC = () => {
 const AddFriendCard: React.FC = () => {
     return (
         <AddFriendButton>
-            <div className="bg-base-100 p-2 rounded-lg shadow-md w-full h-full flex items-center justify-center cursor-pointer hover:bg-base-200 transition-colors border border-base-300">
+            <div className="bg-base-100 p-2 rounded-lg shadow-md w-full h-20 flex items-center justify-center cursor-pointer hover:bg-base-200 transition-colors border border-base-300 group">
                 <div className="flex flex-col items-center justify-center text-base-content">
-                    <Plus/>
+                    <Plus className="w-6 h-6 transition-transform duration-300 transform group-hover:scale-125" />
                 </div>
             </div>
         </AddFriendButton>
     );
 };
+
+
+
 
 export default FriendList;

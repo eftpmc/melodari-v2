@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { LogOut, LogIn, XCircle } from 'lucide-react'; // Import more icons as needed
 
 interface ConfirmDialogProps {
   show: boolean;
@@ -9,14 +10,19 @@ interface ConfirmDialogProps {
   onConfirm: () => void;
   onCancel: () => void;
   confirmButtonText: string;
+  Icon: React.ComponentType; // New prop for the dynamic icon
 }
 
-const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ show, title, message, onConfirm, onCancel, confirmButtonText }) => {
+interface IconProps {
+  className?: string;
+}
+
+const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ show, title, message, onConfirm, onCancel, confirmButtonText, Icon }) => {
   if (!show) return null;
 
   const handleConfirm = () => {
-    onConfirm(); // Call the confirm action
-    onCancel();  // Close the dialog after confirming
+    onConfirm();
+    onCancel();
   };
 
   return (
@@ -32,10 +38,13 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ show, title, message, onC
             Cancel
           </button>
           <button
-            onClick={handleConfirm} // Handle confirm and close
-            className="btn btn-error"
+            onClick={handleConfirm}
+            className="btn bg-base-content hover:bg-primary rounded-full text-base-200 flex items-center group shadow-md border-none"
           >
-            {confirmButtonText}
+            <span>{confirmButtonText}</span>
+            <div className='transition-transform duration-300 transform scale-75 group-hover:rotate-12'>
+              <Icon/>
+            </div>
           </button>
         </div>
       </div>

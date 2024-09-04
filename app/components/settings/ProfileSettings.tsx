@@ -79,7 +79,7 @@ const ProfileSettings: React.FC = () => {
             <button
               key={platform.id}
               onClick={() => togglePlatformSelection(platform.id)}
-              className={`btn btn-sm ${selectedPlatforms.includes(platform.id) ? 'btn-primary text-base-100' : 'btn-outline'}`}
+              className={`btn btn-sm ${selectedPlatforms.includes(platform.id) ? 'bg-base-content hover:bg-base-content text-base-100' : 'btn-outline'}`}
             >
               {platform.icon}
               <span className="ml-2">{platform.name}</span>
@@ -88,7 +88,7 @@ const ProfileSettings: React.FC = () => {
         </div>
       </div>
 
-      <button onClick={handleProfileUpdate} className="btn btn-primary text-base-100">
+      <button onClick={handleProfileUpdate} className="btn bg-base-content hover:bg-primary text-base-100 flex border-none items-center justify-center py-3 px-6 rounded-full shadow-lg transition-all duration-300 ease-in-out hover:px-8">
         Update Profile
       </button>
     </div>
