@@ -48,17 +48,17 @@ const DemoModal = () => {
         </div>
 
         {/* Songs List */}
-        <ul className="space-y-4 max-h-70 overflow-y-auto pt-2 border-t border-base-300">
+        <ul className="space-y-4 max-h-70 overflow-y-auto overflow-x-hidden pt-2 border-t border-base-300">
           {songs.map((song, index) => (
             <li key={song.id} className="flex items-center justify-between py-2 text-base-content">
-              <div className="flex items-center w-full">
+              <div className="flex items-center space-x-2 w-full">
                 <span className="mr-4 text-base-content font-semibold opacity-70">{index + 1}.</span>
-                <div className="inline-flex items-center truncate w-full">
+                <div className="flex-1 flex flex-col">
                   <span className="font-semibold text-base-content truncate">
                     {song.title}
                   </span>
-                  <span className="ml-2 text-sm text-base-content opacity-60">
-                    by {song.artist}
+                  <span className="text-sm text-base-content opacity-60 truncate">
+                    {song.artist}
                   </span>
                 </div>
               </div>

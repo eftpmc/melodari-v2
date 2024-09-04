@@ -1,10 +1,11 @@
-"use client";
+"use client"
 
+import React from 'react';
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import DemoModal from '@/app/components/DemoModal';
-import { FolderSync } from "lucide-react";
+import { FolderSync, Music, PlayCircle, Users } from "lucide-react";
 
 export default function Login() {
     const router = useRouter();
@@ -29,9 +30,9 @@ export default function Login() {
     };
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center px-8 mt-20">
+        <div className="flex min-h-screen flex-col items-center justify-center mt-20">
             {/* Main hero content */}
-            <div className="w-full flex flex-col items-center justify-center my-24">
+            <div className="w-full flex flex-col items-center justify-center my-24 px-8">
                 <h1 className="text-4xl md:text-5xl font-semibold mb-4 text-center text-base-content leading-tight">
                     <span className="inline-block">
                         A{" "}
@@ -53,22 +54,17 @@ export default function Login() {
                 </button>
             </div>
 
-            {/* Demo Modal */}
-            <div className="w-full my-20">
+            <div className="w-full my-20 px-8">
                 <DemoModal />
             </div>
 
-            {/* Info Section */}
-            <div className="flex flex-col items-center justify-center my-20">
-                {/* Icon button */}
+            <div className="flex flex-col items-center justify-center my-20 px-8">
                 <button className="btn bg-base-content hover:bg-primary text-base-100 text-base-100 rounded-full py-2 px-6 mb-6 flex items-center justify-center">
-                    <FolderSync/> Universal
+                    <FolderSync /> Universal
                 </button>
-                {/* Title */}
                 <h2 className="text-3xl md:text-4xl font-semibold mb-4 text-center text-base-content">
                     Connected playlists.
                 </h2>
-                {/* Description */}
                 <p className="text-lg text-center text-base-content opacity-80 max-w-xl mb-8">
                     Melodari uses one playlist that can be connected to all of our supported providers.
                 </p>
