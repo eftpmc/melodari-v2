@@ -1,14 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { FaGoogle } from "react-icons/fa";
 import { useAuth } from "@/contexts/AuthContext";
+import DemoModal from '@/app/components/DemoModal'; // Import the PlaylistModal component
 
 export default function Login() {
     const router = useRouter();
     const { isAuthenticated, getAuthorizeUrl } = useAuth();
-    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         // If user is already authenticated, redirect to home
@@ -18,7 +17,6 @@ export default function Login() {
     }, [isAuthenticated, router]);
 
     const handleGetStarted = async () => {
-        setLoading(true);
         try {
             const authorizeUrl = await getAuthorizeUrl('google');
             if (authorizeUrl) {
@@ -26,13 +24,12 @@ export default function Login() {
             }
         } catch (error) {
             console.error("Error during Google authentication", error);
-        } finally {
-            setLoading(false);
         }
     };
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center px-4 pb-24">
+        <div className="flex min-h-screen flex-col items-center justify-center px-8 mt-20">
+            <div className="w-full flex flex-col items-center justify-center my-24">
             <h1 className="text-4xl md:text-5xl font-semibold mb-4 text-center text-base-content leading-tight">
                 <span className="inline-block">
                     A{" "}
@@ -49,14 +46,14 @@ export default function Login() {
             <button
                 onClick={handleGetStarted}
                 className="btn bg-base-content hover:bg-primary text-base-100 flex border-none items-center justify-center py-3 px-6 rounded-full shadow-lg transition-all duration-300 ease-in-out hover:px-8"
-                disabled={loading}
             >
-                {loading ? (
-                    "Connecting..."
-                ) : (
-                    "Get Started"
-                )}
+                Get Started
             </button>
+            </div>
+
+            <div className="w-full my-20">
+                <DemoModal />
+            </div>
         </div>
     );
 }
