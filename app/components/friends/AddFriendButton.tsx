@@ -37,7 +37,7 @@ const AddFriendButton: React.FC<AddFriendButtonProps> = ({ children }) => {
                         <h3 className="font-bold text-lg text-base-content">Add a Friend</h3>
                         <p className="py-4 text-base-content">Enter your friend&apos;s username to add them.</p>
                         
-                        <div className="flex items-center border border-base-300 rounded-full overflow-hidden">
+                        <div className="flex items-center border border-base-content rounded-full overflow-hidden">
                             <input
                                 type="text"
                                 placeholder="Friend's username"
