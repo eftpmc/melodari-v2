@@ -129,6 +129,7 @@ export const SpotifyPlaylistProvider = ({ children }: SpotifyPlaylistProviderPro
                 const data = await spotifyApi.getPlaylistTracks(spotifyTokens.access_token, playlistId);
                 const fetchedSongs: Song[] = data.items.map((item: any) => ({
                     id: item.track.id,
+                    platform: playlist.source,
                     title: item.track.name,
                     artist: item.track.artists.map((artist: any) => artist.name).join(', '),
                     thumbnails: {

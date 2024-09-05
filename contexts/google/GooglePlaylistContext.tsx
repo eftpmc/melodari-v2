@@ -128,6 +128,7 @@ export const GooglePlaylistProvider = ({ children }: GooglePlaylistProviderProps
                 const data = await googleApi.getPlaylistItems(googleTokens.access_token, playlistId);
                 const fetchedSongs: Song[] = data.items.map((item: any) => ({
                     id: item.snippet.resourceId.videoId,
+                    platform: playlist.source,
                     title: item.snippet.title,
                     artist: item.snippet.videoOwnerChannelTitle,
                     thumbnails: {

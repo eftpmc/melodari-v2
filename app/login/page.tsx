@@ -71,7 +71,7 @@ export default function Login() {
                 </p>
             </div>
 
-            <div className="relative mt-20 w-full min-h-screen background bg-gradient-to-b from-base-300 to-base-content">
+            <div className="relative mt-20 w-full min-h-screen background bg-gradient-to-b from-base-300 to-base-content border-none">
                 {/* SVG Background */}
                 <div className="absolute inset-0 bg-cover bg-no-repeat background text-base-content"></div>
 

@@ -34,7 +34,7 @@ const MenuButton = () => {
 
   return (
     <div className="dropdown dropdown-end">
-      <label tabIndex={0} className="btn bg-base-content hover:bg-primary text-base-200 rounded-full">
+      <label tabIndex={0} className="btn bg-base-content hover:bg-primary text-base-200 rounded-full border-none">
         <Menu className="w-6 h-6" />
         Menu
       </label>

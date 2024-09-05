@@ -197,7 +197,7 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
                 ))}
             </ul>
           ) : songs && songs.length > 0 ? (
-            <ul className="space-y-2 max-h-80 overflow-y-auto border-t border-base-200 pt-2">
+            <ul className="space-y-2 max-h-80 overflow-y-auto border-t border-base-200 pt-2 overflow-x-hidden">
               {songs.map((song, index) => (
                 <SongItem
                   key={song.id}
