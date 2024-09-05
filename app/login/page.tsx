@@ -70,8 +70,19 @@ export default function Login() {
                 </p>
             </div>
 
-            <div className="relative w-full background">
-                Hello
+            <div className="relative mt-20 w-full min-h-screen background bg-gradient-to-b from-base-300 to-base-content">
+                {/* SVG Background */}
+                <div className="absolute inset-0 bg-cover bg-no-repeat background"></div>
+
+                {/* Button under the SVG's point */}
+                <div className="button-wrapper z-20">
+                    <button
+                        onClick={handleGetStarted}
+                        className="btn whitespace-nowrap bg-base-content hover:bg-primary text-base-100 flex border-none items-center justify-center py-3 px-6 rounded-full shadow-lg transition-all duration-300 ease-in-out"
+                    >
+                        Get Started
+                    </button>
+                </div>
             </div>
         </div>
     );
