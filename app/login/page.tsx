@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import DemoModal from '@/app/components/DemoModal';
 import { FolderSync, Music, PlayCircle, Users } from "lucide-react";
+import Footer from "@/app/components/Footer";
 
 export default function Login() {
     const router = useRouter();
@@ -72,17 +73,19 @@ export default function Login() {
 
             <div className="relative mt-20 w-full min-h-screen background bg-gradient-to-b from-base-300 to-base-content">
                 {/* SVG Background */}
-                <div className="absolute inset-0 bg-cover bg-no-repeat background"></div>
+                <div className="absolute inset-0 bg-cover bg-no-repeat background text-base-content"></div>
 
                 {/* Button under the SVG's point */}
-                <div className="button-wrapper z-20">
+                <div className="button-wrapper z-20 p-2">
                     <button
-                        onClick={handleGetStarted}
-                        className="btn whitespace-nowrap bg-base-content hover:bg-primary text-base-100 flex border-none items-center justify-center py-3 px-6 rounded-full shadow-lg transition-all duration-300 ease-in-out"
+                        className="btn whitespace-nowrap bg-base-300 hover:bg-primary text-base-content flex border-none items-center justify-center py-3 px-6 rounded-full shadow-lg transition-all duration-300 ease-in-out"
                     >
-                        Get Started
+                        View API
                     </button>
                 </div>
+
+                <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl'>Coming soon!</div>
+                <Footer></Footer>
             </div>
         </div>
     );

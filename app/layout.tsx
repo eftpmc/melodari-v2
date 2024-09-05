@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Link from "next/link";
 import ClientProvider from "./components/ClientProvider";
-import HeaderButtons from "./components/HeaderButtons"; // Import HeaderButtons
+import HeaderButtons from "./components/HeaderButtons"; 
+import Logo from "@/app/components/Logo"; // Import the Logo component
 
 export const metadata: Metadata = {
   title: "melodari",
@@ -24,14 +25,12 @@ export default function RootLayout({
           >
             <Link href="/" passHref>
               <div className="flex flex-row justify-between items-center">
-                <h1 className="text-xl font-bold">Melodari</h1>
+                <Logo /> {/* Use Logo component here */}
               </div>
             </Link>
             <HeaderButtons />
           </header>
-          <main className="bg-base-300 w-full flex-1">
-            {children}
-          </main>
+          <main className="bg-base-300 w-full flex-1">{children}</main>
         </body>
       </ClientProvider>
     </html>

@@ -16,6 +16,14 @@
   }
 }
 
+:root {
+  --background-image-light: url('/bg1.svg');
+}
+
+[data-theme='dark'] {
+  --background-image-dark: url('/bg2.svg');
+}
+
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
@@ -181,19 +189,33 @@ body {
 }
 
 .background {
-  background-image: url('/bg2.svg');
+  background-image: var(--background-image-light);
+}
+
+[data-theme='dark'] .background {
+  background-image: var(--background-image-dark);
+}
+
+.background {
   background-size: cover; 
   background-position: bottom center;
   background-repeat: no-repeat;
   width: 100%;
-  height: 100vh; /* or another suitable height */
+  height: 150vh; /* or another suitable height */
   position: relative;
 }
 
 .button-wrapper {
   position: absolute;
-  top: calc(10vh + 10px); /* Adjust this based on where the pyramid's point is */
+  top: calc(10vh + 10px); /* Default for larger screens */
   left: calc(83vw + 5px);
   transform: translate(-50%, -50%);
 }
 
+@media (max-width: 640px) {
+  .button-wrapper {
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
