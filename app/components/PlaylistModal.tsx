@@ -41,10 +41,10 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
 
   useEffect(() => {
     const loadSongs = async () => {
-      if (playlist.platforms.includes('google')) {
+      if (playlist.source.includes('google')) {
         const fetchedSongs = await fetchGoogleSongs(playlist.id);
         setSongs(fetchedSongs);
-      } else if (playlist.platforms.includes('spotify')) {
+      } else if (playlist.source.includes('spotify')) {
         const fetchedSongs = await fetchSpotifySongs(playlist.id);
         setSongs(fetchedSongs);
       }
