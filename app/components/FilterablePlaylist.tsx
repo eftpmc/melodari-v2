@@ -51,15 +51,6 @@ export default function FilterablePlaylist() {
   const combinedPlaylists = useMemo(() => {
     const playlistMap: { [title: string]: Playlist } = {};
 
-    googlePlaylists.forEach((playlist) => {
-      if (!playlistMap[playlist.title]) {
-        playlistMap[playlist.title] = {
-          ...playlist,
-          platforms: ['google'],
-        };
-      }
-    });
-
     spotifyPlaylists.forEach((playlist) => {
       if (playlistMap[playlist.title]) {
         playlistMap[playlist.title].platforms.push('spotify');
@@ -67,6 +58,17 @@ export default function FilterablePlaylist() {
         playlistMap[playlist.title] = {
           ...playlist,
           platforms: ['spotify'],
+        };
+      }
+    });
+
+    googlePlaylists.forEach((playlist) => {
+      if (playlistMap[playlist.title]) {
+        playlistMap[playlist.title].platforms.push('google');
+      } else {  // Corrected the syntax here
+        playlistMap[playlist.title] = {
+          ...playlist,
+          platforms: ['google'],
         };
       }
     });
