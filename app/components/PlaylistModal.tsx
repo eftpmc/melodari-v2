@@ -13,14 +13,16 @@ import { toast } from 'react-hot-toast';
 interface PlaylistModalProps {
   playlist: Playlist;
   onClose: () => void;
+  onStartLoading: () => void;
+  onFinishLoading: () => void;
 }
 
 const platformsData = [
-  { id: 'google', name: 'YouTube Music', icon: <SiYoutubemusic className="w-6 h-6 text-red-600" /> },
   { id: 'spotify', name: 'Spotify', icon: <FaSpotify className="w-6 h-6 text-green-600" /> },
+  { id: 'google', name: 'YouTube Music', icon: <SiYoutubemusic className="w-6 h-6 text-red-600" /> },
 ];
 
-const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
+const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose, onStartLoading, onFinishLoading }) => {
   const { playlists: googlePlaylists, fetchSongsForPlaylist: fetchGoogleSongs, findGooglePlaylist, createGooglePlaylist, matchSongsOnGoogle, addSongsToGooglePlaylist, refreshPlaylists: refreshGooglePlaylists } = useGooglePlaylistContext();
   const { playlists: spotifyPlaylists, fetchSongsForPlaylist: fetchSpotifySongs, findSpotifyPlaylist, createSpotifyPlaylist, matchSongsOnSpotify, addSongsToSpotifyPlaylist, refreshPlaylists: refreshSpotifyPlaylists } = useSpotifyPlaylistContext();
   const { isGoogleAuth } = useGoogleAuthContext();
@@ -53,7 +55,6 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
       const [googleSongs, spotifySongs] = await Promise.all([googleSongsPromise, spotifySongsPromise]);
       setSongs({ google: googleSongs, spotify: spotifySongs });
 
-      // Set the active platform to the one with songs, prioritizing Spotify
       if (spotifySongs.length > 0) {
         setActivePlatform('spotify');
       } else if (googleSongs.length > 0) {
@@ -76,6 +77,7 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
   const handleAddPlatform = async (platformId: 'google' | 'spotify') => {
     if (songs[platformId].length > 0) return; // Platform already added
 
+    onStartLoading(); // Trigger loading state
     setLoading(prev => ({ ...prev, [platformId]: true }));
 
     try {
@@ -112,6 +114,7 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
       toast.error('Failed to add platform. Please try again.');
     } finally {
       setLoading(prev => ({ ...prev, [platformId]: false }));
+      onFinishLoading(); // Finish loading state
     }
   };
 
@@ -153,7 +156,7 @@ const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose }) => {
               <p className="text-sm text-gray-500">{playlist.description}</p>
               <div className="flex items-center mt-4 space-x-2">
                 {platformsData.map((platform) => {
-                  const hasSongs = songs[platform.id as 'google' | 'spotify'].length > 0;
+                  const hasSongs = songs[platform.id as 'spotify' | 'google'].length > 0;
                   return hasSongs ? (
                     <button
                       key={platform.id}

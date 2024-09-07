@@ -11,6 +11,7 @@ export default function FilterablePlaylist() {
   const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
   const [loading, setLoading] = useState(true);
   const [playCounts, setPlayCounts] = useState<{ [id: string]: number }>({});
+  const [isLoadingModalOpen, setIsLoadingModalOpen] = useState(false);
 
   const { getPlayCount, incrementPlayCount } = useProfile();
   const { playlists: googlePlaylists, refreshPlaylists: refreshGooglePlaylists } = useGooglePlaylistContext();
@@ -50,7 +51,7 @@ export default function FilterablePlaylist() {
 
   const combinedPlaylists = useMemo(() => {
     const playlistMap: { [title: string]: Playlist } = {};
-  
+
     spotifyPlaylists.forEach((playlist) => {
       if (playlistMap[playlist.title]) {
         playlistMap[playlist.title].platforms = Array.from(new Set([...playlistMap[playlist.title].platforms, 'spotify']));
@@ -63,7 +64,7 @@ export default function FilterablePlaylist() {
         };
       }
     });
-  
+
     googlePlaylists.forEach((playlist) => {
       if (playlistMap[playlist.title]) {
         playlistMap[playlist.title].platforms = Array.from(new Set([...playlistMap[playlist.title].platforms, 'google']));
@@ -76,7 +77,7 @@ export default function FilterablePlaylist() {
         };
       }
     });
-  
+
     return Object.values(playlistMap)
       .map(playlist => ({
         ...playlist,
@@ -112,6 +113,15 @@ export default function FilterablePlaylist() {
 
   const closeModal = () => {
     setSelectedPlaylist(null);
+  };
+
+  const handleStartLoading = () => {
+    closeModal();
+    setIsLoadingModalOpen(true);
+  };
+
+  const handleFinishLoading = () => {
+    setIsLoadingModalOpen(false);
   };
 
   return (
@@ -152,9 +162,9 @@ export default function FilterablePlaylist() {
             ))
         ) : filteredPlaylists.length > 0 ? (
           filteredPlaylists.map((playlist) => (
-            <PlaylistCard 
-              key={playlist.id} 
-              playlist={playlist} 
+            <PlaylistCard
+              key={playlist.id}
+              playlist={playlist}
               onClick={() => openModal(playlist)}
             />
           ))
@@ -166,7 +176,23 @@ export default function FilterablePlaylist() {
       </div>
 
       {selectedPlaylist && (
-        <PlaylistModal playlist={selectedPlaylist} onClose={closeModal} />
+        <PlaylistModal
+          playlist={selectedPlaylist}
+          onClose={closeModal}
+          onStartLoading={handleStartLoading}
+          onFinishLoading={handleFinishLoading}
+        />
+      )}
+
+      {/* Loading Modal */}
+      {isLoadingModalOpen && (
+        <dialog id="loading_modal" className="modal modal-middle" open>
+          <form method="dialog" className="modal-box">
+            <h3 className="font-bold text-lg text-base-content">Converting...</h3>
+            <p className="py-4 text-base-content">Please wait while we process your request.</p>
+            <progress className="progress w-full"></progress>
+          </form>
+        </dialog>
       )}
     </div>
   );
