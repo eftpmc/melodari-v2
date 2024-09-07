@@ -43,7 +43,6 @@ export interface Playlist {
 export interface GoogleSong {
   id: string;
   title: string;
-  videoId: string;
   thumbnails: {
     default: string;
     medium: string;

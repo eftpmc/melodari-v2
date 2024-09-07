@@ -4,7 +4,7 @@ import PlaylistCard from './PlaylistCard';
 import PlaylistModal from './PlaylistModal';
 import { useGooglePlaylistContext } from '@/contexts/google/GooglePlaylistContext';
 import { useSpotifyPlaylistContext } from '@/contexts/spotify/SpotifyPlaylistContext';
-import { Playlist } from '@/types';
+import { Playlist, Song } from '@/types';
 
 export default function FilterablePlaylist() {
   const [filter, setFilter] = useState<'All' | 'YouTube Music' | 'Spotify'>('All');
@@ -50,30 +50,43 @@ export default function FilterablePlaylist() {
 
   const combinedPlaylists = useMemo(() => {
     const playlistMap: { [title: string]: Playlist } = {};
-
+  
     spotifyPlaylists.forEach((playlist) => {
       if (playlistMap[playlist.title]) {
-        playlistMap[playlist.title].platforms.push('spotify');
+        playlistMap[playlist.title].platforms = Array.from(new Set([...playlistMap[playlist.title].platforms, 'spotify']));
+        playlistMap[playlist.title].songs = [...playlistMap[playlist.title].songs, ...playlist.songs];
       } else {
         playlistMap[playlist.title] = {
           ...playlist,
           platforms: ['spotify'],
+          songs: [...playlist.songs],
         };
       }
     });
-
+  
     googlePlaylists.forEach((playlist) => {
       if (playlistMap[playlist.title]) {
-        playlistMap[playlist.title].platforms.push('google');
-      } else {  // Corrected the syntax here
+        playlistMap[playlist.title].platforms = Array.from(new Set([...playlistMap[playlist.title].platforms, 'google']));
+        playlistMap[playlist.title].songs = [...playlistMap[playlist.title].songs, ...playlist.songs];
+      } else {
         playlistMap[playlist.title] = {
           ...playlist,
           platforms: ['google'],
+          songs: [...playlist.songs],
         };
       }
     });
-
-    return Object.values(playlistMap).sort((a, b) => (playCounts[b.id] || 0) - (playCounts[a.id] || 0));
+  
+    return Object.values(playlistMap)
+      .map(playlist => ({
+        ...playlist,
+        platforms: Array.from(new Set([
+          ...playlist.platforms,
+          ...(playlist.songs.some(song => song.platform === 'google') ? ['google'] : []),
+          ...(playlist.songs.some(song => song.platform === 'spotify') ? ['spotify'] : [])
+        ]))
+      }))
+      .sort((a, b) => (playCounts[b.id] || 0) - (playCounts[a.id] || 0));
   }, [googlePlaylists, spotifyPlaylists, playCounts]);
 
   const filteredPlaylists = useMemo(() => {

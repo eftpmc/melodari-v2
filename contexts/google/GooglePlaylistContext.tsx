@@ -263,7 +263,6 @@ export const GooglePlaylistProvider = ({ children }: GooglePlaylistProviderProps
                 return {
                     id: video.id.videoId,
                     title: video.snippet.title,
-                    videoId: video.id.videoId,
                     thumbnails: {
                         default: video.snippet.thumbnails.default.url,
                         medium: video.snippet.thumbnails.medium.url,
