@@ -46,10 +46,9 @@ const PlaylistDrawer: React.FC<PlaylistDrawerProps> = ({ song, onClose }) => {
     <div className="drawer drawer-end">
       <input id="playlist-drawer" type="checkbox" className="drawer-toggle" checked />
       <div className="drawer-content">
-        {/* Drawer content */}
         <label htmlFor="playlist-drawer" className="drawer-overlay" onClick={onClose}></label>
         <div className="p-4 bg-base-100 shadow-lg rounded-lg w-80">
-          <h3 className="text-lg font-bold mb-4">Add "{song.title}" to Playlists</h3>
+          <h3 className="text-lg font-bold mb-4">Add &quot;{song.title}&quot; to Playlists</h3>
           <ul className="menu">
             {allPlaylists.map((playlist: Playlist) => (
               <li key={playlist.id}>
