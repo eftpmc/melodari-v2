@@ -15,7 +15,7 @@ const SongItem: React.FC<SongItemProps> = ({ song, index, isOpen, onClick }) => 
 
   return (
     <li className="text-base-content p-2 hover:bg-base-200 rounded-md">
-      <div className="flex justify-between items-center cursor-pointer" onClick={onClick}>
+      <div className="flex justify-between items-center cursor-pointer" /* onClick={onClick} */>
         <div className="flex items-center space-x-2 w-full">
           <img 
             src={thumbnailUrl} 
